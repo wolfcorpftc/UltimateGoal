@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util;
+package org.wolfcorp.ultimategoal.util;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 
