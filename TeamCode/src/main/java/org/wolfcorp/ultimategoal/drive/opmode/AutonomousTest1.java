@@ -6,8 +6,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.wolfcorp.ultimategoal.drive.MecanumDriveTest1;
-import org.wolfcorp.ultimategoal.drive.SampleMecanumDrive;
+import org.wolfcorp.ultimategoal.drive.Drivetrain;
 
 /*
  * This is a simple routine to test translational drive capabilities.
@@ -19,7 +18,7 @@ public class AutonomousTest1 extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        MecanumDriveTest1 drive = new MecanumDriveTest1(hardwareMap);
+        Drivetrain drive = new Drivetrain(hardwareMap);
 
         Trajectory trajectory = drive.trajectoryBuilder(new Pose2d())
                 .forward(DISTANCE)

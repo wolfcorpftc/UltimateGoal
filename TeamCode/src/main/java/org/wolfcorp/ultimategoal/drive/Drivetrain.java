@@ -25,10 +25,14 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.wolfcorp.ultimategoal.util.AxesSigns;
+import org.wolfcorp.ultimategoal.util.BNO055IMUUtil;
 import org.wolfcorp.ultimategoal.util.DashboardUtil;
 import org.wolfcorp.ultimategoal.util.LynxModuleUtil;
 
@@ -50,7 +54,7 @@ import static org.wolfcorp.ultimategoal.drive.DriveConstants.kV;
  * Simple mecanum drive hardware implementation for REV hardware.
  */
 @Config
-public class SampleMecanumDrive extends MecanumDrive {
+public class Drivetrain extends MecanumDrive {
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
 
@@ -69,7 +73,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     private FtcDashboard dashboard;
     private NanoClock clock;
 
-    private Mode mode;
+    private Drivetrain.Mode mode;
 
     private PIDFController turnController;
     private MotionProfile turnProfile;
@@ -80,13 +84,13 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     private List<Pose2d> poseHistory;
 
-    private DcMotorEx leftFront, leftRear, rightRear, rightFront;
+    private DcMotorEx leftFront, leftBack, rightBack, rightFront;
     private List<DcMotorEx> motors;
     private BNO055IMU imu;
 
     private Pose2d lastPoseOnTurn;
 
-    public SampleMecanumDrive(HardwareMap hardwareMap) {
+    public Drivetrain(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
 
         dashboard = FtcDashboard.getInstance();
@@ -94,7 +98,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
         clock = NanoClock.system();
 
-        mode = Mode.IDLE;
+        mode = Drivetrain.Mode.IDLE;
 
         turnController = new PIDFController(HEADING_PID);
         turnController.setInputBounds(0, 2 * Math.PI);
@@ -119,14 +123,14 @@ public class SampleMecanumDrive extends MecanumDrive {
 
         // TODO: if your hub is mounted vertically, remap the IMU axes so that the z-axis points
         // upward (normal to the floor) using a command like the following:
-        // BNO055IMUUtil.remapAxes(imu, AxesOrder.XYZ, AxesSigns.NPN);
+        BNO055IMUUtil.remapAxes(imu, AxesOrder.XYZ, AxesSigns.NPN);
 
-        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
-        leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
-        rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
-        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+        leftFront = hardwareMap.get(DcMotorEx.class, "LF");
+        leftBack = hardwareMap.get(DcMotorEx.class, "LB");
+        rightBack = hardwareMap.get(DcMotorEx.class, "RB");
+        rightFront = hardwareMap.get(DcMotorEx.class, "RF");
 
-        motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
+        motors = Arrays.asList(leftFront, leftBack, rightBack, rightFront);
 
         for (DcMotorEx motor : motors) {
             MotorConfigurationType motorConfigurationType = motor.getMotorType().clone();
@@ -145,6 +149,8 @@ public class SampleMecanumDrive extends MecanumDrive {
         }
 
         // TODO: reverse any motors using DcMotor.setDirection()
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // TODO: if desired, use setLocalizer() to change the localization method
         // for instance, setLocalizer(new ThreeTrackingWheelLocalizer(...));
@@ -176,7 +182,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         );
 
         turnStart = clock.seconds();
-        mode = Mode.TURN;
+        mode = Drivetrain.Mode.TURN;
     }
 
     public void turn(double angle) {
@@ -186,7 +192,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     public void followTrajectoryAsync(Trajectory trajectory) {
         follower.followTrajectory(trajectory);
-        mode = Mode.FOLLOW_TRAJECTORY;
+        mode = Drivetrain.Mode.FOLLOW_TRAJECTORY;
     }
 
     public void followTrajectory(Trajectory trajectory) {
@@ -254,7 +260,7 @@ public class SampleMecanumDrive extends MecanumDrive {
                 DashboardUtil.drawRobot(fieldOverlay, newPose);
 
                 if (t >= turnProfile.duration()) {
-                    mode = Mode.IDLE;
+                    mode = Drivetrain.Mode.IDLE;
                     setDriveSignal(new DriveSignal());
                 }
 
@@ -275,7 +281,7 @@ public class SampleMecanumDrive extends MecanumDrive {
                 DashboardUtil.drawPoseHistory(fieldOverlay, poseHistory);
 
                 if (!follower.isFollowing()) {
-                    mode = Mode.IDLE;
+                    mode = Drivetrain.Mode.IDLE;
                     setDriveSignal(new DriveSignal());
                 }
 
@@ -296,7 +302,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     }
 
     public boolean isBusy() {
-        return mode != Mode.IDLE;
+        return mode != Drivetrain.Mode.IDLE;
     }
 
     public void setMode(DcMotor.RunMode runMode) {
@@ -366,8 +372,8 @@ public class SampleMecanumDrive extends MecanumDrive {
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
         leftFront.setPower(v);
-        leftRear.setPower(v1);
-        rightRear.setPower(v2);
+        leftBack.setPower(v1);
+        rightBack.setPower(v2);
         rightFront.setPower(v3);
     }
 
