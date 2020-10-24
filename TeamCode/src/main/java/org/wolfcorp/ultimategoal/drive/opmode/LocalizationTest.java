@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.wolfcorp.ultimategoal.drive.Drivetrain;
+import org.wolfcorp.ultimategoal.drive.StandardTrackingWheelLocalizer;
 
 /**
  * This is a simple teleop routine for testing localization. Drive the robot around like a normal
@@ -41,6 +42,7 @@ public class LocalizationTest extends LinearOpMode {
             telemetry.addData("x", poseEstimate.getX());
             telemetry.addData("y", poseEstimate.getY());
             telemetry.addData("heading", poseEstimate.getHeading());
+            telemetry.addData("Small Encoder", ((StandardTrackingWheelLocalizer)drive.getLocalizer()).getWheelPositions());
             telemetry.update();
         }
     }

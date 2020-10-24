@@ -233,6 +233,8 @@ public class Drivetrain extends MecanumDrive {
         packet.put("yError", lastError.getY());
         packet.put("headingError", lastError.getHeading());
 
+        packet.put("encoder stuff", ((StandardTrackingWheelLocalizer)getLocalizer()).getWheelTicks());
+
         switch (mode) {
             case IDLE:
                 // do nothing
