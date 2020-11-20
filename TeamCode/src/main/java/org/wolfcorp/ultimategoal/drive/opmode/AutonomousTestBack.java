@@ -1,7 +1,6 @@
 package org.wolfcorp.ultimategoal.drive.opmode;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.drive.Drive;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -21,7 +20,7 @@ public class AutonomousTestBack extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Drivetrain drive = new Drivetrain(hardwareMap);
 
-        Trajectory trajectory = drive.trajectoryBuilder(new Pose2d())
+        Trajectory trajectory = drive.from(new Pose2d())
                 .forward(DISTANCE)
                 .build();
 
@@ -29,6 +28,6 @@ public class AutonomousTestBack extends LinearOpMode {
 
         if (isStopRequested()) return;
 
-        drive.followTrajectory(trajectory);
+        drive.follow(trajectory);
     }
 }

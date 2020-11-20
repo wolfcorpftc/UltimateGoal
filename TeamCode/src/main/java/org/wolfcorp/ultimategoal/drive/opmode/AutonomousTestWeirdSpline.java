@@ -20,7 +20,7 @@ public class AutonomousTestWeirdSpline extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Drivetrain drive = new Drivetrain(hardwareMap);
 
-        Trajectory trajectory = drive.trajectoryBuilder(new Pose2d())
+        Trajectory trajectory = drive.from(new Pose2d())
                 .splineToSplineHeading(new Pose2d(40, 40, Math.toRadians(90)), Math.toRadians(0))
                 .build();
 
@@ -29,6 +29,6 @@ public class AutonomousTestWeirdSpline extends LinearOpMode {
 
         if (isStopRequested()) return;
 
-        drive.followTrajectory(trajectory);
+        drive.follow(trajectory);
     }
 }

@@ -34,19 +34,19 @@ public class BackAndForth extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Drivetrain drive = new Drivetrain(hardwareMap);
 
-        Trajectory trajectoryForward = drive.trajectoryBuilder(new Pose2d())
+        Trajectory trajectoryForward = drive.from(new Pose2d())
                 .forward(DISTANCE)
                 .build();
 
-        Trajectory trajectoryBackward = drive.trajectoryBuilder(trajectoryForward.end())
+        Trajectory trajectoryBackward = drive.from(trajectoryForward.end())
                 .back(DISTANCE)
                 .build();
 
         waitForStart();
 
         while (opModeIsActive() && !isStopRequested()) {
-            drive.followTrajectory(trajectoryForward);
-            drive.followTrajectory(trajectoryBackward);
+            drive.follow(trajectoryForward);
+            drive.follow(trajectoryBackward);
         }
     }
 }

@@ -156,15 +156,15 @@ public class Drivetrain extends MecanumDrive {
         setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap));
     }
 
-    public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {
+    public TrajectoryBuilder from(Pose2d startPose) {
         return new TrajectoryBuilder(startPose, constraints);
     }
 
-    public TrajectoryBuilder trajectoryBuilder(Pose2d startPose, boolean reversed) {
+    public TrajectoryBuilder from(Pose2d startPose, boolean reversed) {
         return new TrajectoryBuilder(startPose, reversed, constraints);
     }
 
-    public TrajectoryBuilder trajectoryBuilder(Pose2d startPose, double startHeading) {
+    public TrajectoryBuilder from(Pose2d startPose, double startHeading) {
         return new TrajectoryBuilder(startPose, startHeading, constraints);
     }
 
@@ -190,13 +190,13 @@ public class Drivetrain extends MecanumDrive {
         waitForIdle();
     }
 
-    public void followTrajectoryAsync(Trajectory trajectory) {
+    public void followAsync(Trajectory trajectory) {
         follower.followTrajectory(trajectory);
         mode = Drivetrain.Mode.FOLLOW_TRAJECTORY;
     }
 
-    public void followTrajectory(Trajectory trajectory) {
-        followTrajectoryAsync(trajectory);
+    public void follow(Trajectory trajectory) {
+        followAsync(trajectory);
         waitForIdle();
     }
 
