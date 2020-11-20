@@ -1,4 +1,4 @@
-package org.wolfcorp.ultimategoal.drive.opmode;
+package org.wolfcorp.ultimategoal.drive.test;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;

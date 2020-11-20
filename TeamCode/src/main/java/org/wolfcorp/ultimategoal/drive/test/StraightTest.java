@@ -1,4 +1,4 @@
-package org.wolfcorp.ultimategoal.drive.opmode;
+package org.wolfcorp.ultimategoal.drive.test;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -12,9 +12,9 @@ import org.wolfcorp.ultimategoal.drive.Drivetrain;
  * This is a simple routine to test translational drive capabilities.
  */
 @Config
-@Autonomous(name="Autonomous Test Forward", group = "drive")
-public class AutonomousTestForward extends LinearOpMode {
-    public static double DISTANCE = 10; // in
+@Autonomous(group = "drive")
+public class StraightTest extends LinearOpMode {
+    public static double DISTANCE = 60; // in
 
     @Override
     public void runOpMode() throws InterruptedException {

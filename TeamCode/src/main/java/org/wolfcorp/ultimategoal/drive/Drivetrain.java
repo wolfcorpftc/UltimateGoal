@@ -64,6 +64,8 @@ public class Drivetrain extends MecanumDrive {
     public static double VY_WEIGHT = 1;
     public static double OMEGA_WEIGHT = 1;
 
+    public double speedMultiplier = 1;
+
     public enum Mode {
         IDLE,
         TURN,
@@ -372,15 +374,56 @@ public class Drivetrain extends MecanumDrive {
     }
 
     @Override
-    public void setMotorPowers(double v, double v1, double v2, double v3) {
-        leftFront.setPower(v);
-        leftBack.setPower(v1);
-        rightBack.setPower(v2);
-        rightFront.setPower(v3);
+    public void setMotorPowers(double lf, double lb, double rb, double rf) {
+        leftFront.setPower(lf);
+        leftBack.setPower(lb);
+        rightBack.setPower(rb);
+        rightFront.setPower(rf);
+    }
+
+    public void setMotorPowers(double v) {
+        this.setMotorPowers(v, v, v, v);
     }
 
     @Override
     public double getRawExternalHeading() {
         return imu.getAngularOrientation().firstAngle;
+    }
+
+    public static void normalize(double[] wheelSpeeds) {
+        double maxMagnitude = Math.abs(wheelSpeeds[0]);
+
+        for (int i = 1; i < wheelSpeeds.length; i++) {
+            double magnitude = Math.abs(wheelSpeeds[i]);
+
+            if (magnitude > maxMagnitude) {
+                maxMagnitude = magnitude;
+            }
+        }
+
+        if (maxMagnitude > 1.0) {
+            for (int i = 0; i < wheelSpeeds.length; i++) {
+                wheelSpeeds[i] /= maxMagnitude;
+            }
+        }
+    }
+
+    public void drive(double x, double y, double rotation) {
+        double[] wheelSpeeds = new double[4];
+
+        wheelSpeeds[0] = x + y + rotation; // LF
+        wheelSpeeds[1] = x - y - rotation; // RF
+        wheelSpeeds[2] = x - y + rotation; // LB
+        wheelSpeeds[3] = x + y - rotation; // RB
+        normalize(wheelSpeeds);
+
+        for (int i = 0; i < 4; i++)
+            wheelSpeeds[i] = Math.pow(wheelSpeeds[i],3);
+        normalize(wheelSpeeds);
+
+        for (int i = 0; i < 4; i++)
+            wheelSpeeds[i] *= speedMultiplier;
+
+        setMotorPowers(wheelSpeeds[0], wheelSpeeds[2], wheelSpeeds[3], wheelSpeeds[1]);
     }
 }

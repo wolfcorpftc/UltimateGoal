@@ -1,4 +1,4 @@
-package org.wolfcorp.ultimategoal.drive.opmode;
+package org.wolfcorp.ultimategoal.drive.test;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -12,8 +12,8 @@ import org.wolfcorp.ultimategoal.drive.Drivetrain;
  * This is a simple routine to test translational drive capabilities.
  */
 @Config
-@Autonomous(name="Autonomous Test Spline", group = "drive")
-public class AutonomousTestWeirdSpline extends LinearOpMode {
+@Autonomous(name="Autonomous Test Backward", group = "drive")
+public class AutonomousTestBack extends LinearOpMode {
     public static double DISTANCE = 10; // in
 
     @Override
@@ -21,9 +21,8 @@ public class AutonomousTestWeirdSpline extends LinearOpMode {
         Drivetrain drive = new Drivetrain(hardwareMap);
 
         Trajectory trajectory = drive.from(new Pose2d())
-                .splineToSplineHeading(new Pose2d(40, 40, Math.toRadians(90)), Math.toRadians(0))
+                .forward(DISTANCE)
                 .build();
-
 
         waitForStart();
 
