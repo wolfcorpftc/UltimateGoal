@@ -61,4 +61,6 @@ public class TargetZoneChooser extends OpenCvPipeline {
 
         return mat;
     }
+
+    public Target getTarget() { return target; }
 }
