@@ -86,7 +86,7 @@ public class Drivetrain extends MecanumDrive {
 
     private List<Pose2d> poseHistory;
 
-    private DcMotorEx leftFront, leftBack, rightBack, rightFront;
+    public DcMotorEx leftFront, leftBack, rightBack, rightFront;
     private List<DcMotorEx> motors;
     private BNO055IMU imu;
 
