@@ -55,8 +55,18 @@ import static org.wolfcorp.ultimategoal.drive.DriveConstants.kV;
  */
 @Config
 public class Drivetrain extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
+
+    public static double TKP = 0;
+    public static double TKI = 0;
+    public static double TKD = 0;
+
+    public static double HKP = 8;
+    public static double HKI = 0;
+    public static double HKD = 0;
+
+
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(TKP, TKI, TKD);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(HKP, HKI, HKD);
 
     public static double LATERAL_MULTIPLIER = 1;
 
