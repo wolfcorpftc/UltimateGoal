@@ -6,4 +6,9 @@ import org.wolfcorp.ultimategoal.drive.Drivetrain;
 
 public abstract class OpMode extends LinearOpMode {
     protected Drivetrain drive = new Drivetrain(hardwareMap);
+
+    void shoot() {}
+
+    void startIntake(){}
+    void stopIntake(){}
 }
