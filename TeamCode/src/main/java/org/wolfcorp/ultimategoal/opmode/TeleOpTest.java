@@ -1,6 +1,12 @@
 package org.wolfcorp.ultimategoal.opmode;
 
-public class TeleOp extends OpMode {
+import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+@Config
+@TeleOp(name="Current TeleOp", group = "drive")
+public class TeleOpTest extends OpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         // Send telemetry message to signify robot waiting;
@@ -38,6 +44,8 @@ public class TeleOp extends OpMode {
             //  (odometry gets more and more inaccurate over time)
 
             drive.update(); // odometry update
+
+
         }
     }
 }
