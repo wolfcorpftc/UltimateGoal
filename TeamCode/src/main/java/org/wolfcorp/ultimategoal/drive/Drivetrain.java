@@ -30,9 +30,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.wolfcorp.ultimategoal.util.AxesSigns;
-import org.wolfcorp.ultimategoal.util.BNO055IMUUtil;
 import org.wolfcorp.ultimategoal.util.DashboardUtil;
 import org.wolfcorp.ultimategoal.util.LynxModuleUtil;
 
@@ -165,7 +162,7 @@ public class Drivetrain extends MecanumDrive {
         leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Set up odometry
-        setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap));
+        setLocalizer(new ThreeWheelTrackingLocalizer(hardwareMap));
     }
 
     public TrajectoryBuilder from(Pose2d startPose) {
@@ -245,9 +242,9 @@ public class Drivetrain extends MecanumDrive {
         packet.put("yError", lastError.getY());
         packet.put("headingError", lastError.getHeading());
 
-        packet.put("Left Encoder", ((StandardTrackingWheelLocalizer)getLocalizer()).getWheelTicks().get(0));
-        packet.put("Right Encoder", ((StandardTrackingWheelLocalizer)getLocalizer()).getWheelTicks().get(1));
-        packet.put("Back Encoder", ((StandardTrackingWheelLocalizer)getLocalizer()).getWheelTicks().get(2));
+        packet.put("Left Encoder", ((ThreeWheelTrackingLocalizer)getLocalizer()).getWheelTicks().get(0));
+        packet.put("Right Encoder", ((ThreeWheelTrackingLocalizer)getLocalizer()).getWheelTicks().get(1));
+        packet.put("Back Encoder", ((ThreeWheelTrackingLocalizer)getLocalizer()).getWheelTicks().get(2));
 
         switch (mode) {
             case IDLE:
