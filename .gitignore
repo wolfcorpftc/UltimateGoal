@@ -90,3 +90,6 @@ lint/tmp/
 .idea
 .project
 .settings
+
+# Secrets
+TeamCode/src/main/java/org/wolfcorp/ultimategoal/vision/Secrets.java

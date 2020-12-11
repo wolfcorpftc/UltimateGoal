@@ -1,6 +1,7 @@
 package org.wolfcorp.ultimategoal.vision;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
@@ -9,24 +10,28 @@ import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvInternalCamera;
 import org.openftc.easyopencv.OpenCvPipeline;
 @Disabled
-public class TargetZoneChooser extends OpenCvPipeline {
+public class OpenCVZoneChooser extends OpenCvPipeline implements ZoneChooser {
 
+    protected OpenCvCamera cam;
     protected Telemetry telemetry;
     protected Rect ROI;
     protected Mat mat = new Mat();
     protected Target target = Target.UNSET;
 
-    public TargetZoneChooser(StartingPosition sp, Telemetry telemetry) {
+    public OpenCVZoneChooser(StartingPosition sp) {
         // TODO: tune the rectangles
         switch (sp) {
-            case BL: ROI = new Rect(new Point(60, 35), new Point(120, 75));break;
-            case BR: ROI = new Rect(new Point(60, 35), new Point(120, 75));break;
-            case RL: ROI = new Rect(new Point(60, 35), new Point(120, 75));break;
-            case RR: ROI = new Rect(new Point(60, 35), new Point(120, 75));break;
+            case BL: ROI = new Rect(new Point(60, 35), new Point(120, 75)); break;
+            case BR: ROI = new Rect(new Point(60, 35), new Point(120, 75)); break;
+            case RL: ROI = new Rect(new Point(60, 35), new Point(120, 75)); break;
+            case RR: ROI = new Rect(new Point(60, 35), new Point(120, 75)); break;
         }
-        this.telemetry = telemetry;
     }
 
     public Mat processFrame(Mat input) {
@@ -65,5 +70,25 @@ public class TargetZoneChooser extends OpenCvPipeline {
         return mat;
     }
 
-    public Target getTarget() { return target; }
+    public void init(HardwareMap hardwareMap, Telemetry telemetry) {
+        this.telemetry = telemetry;
+        int cameraMonitorViewId = hardwareMap.appContext
+                .getResources().getIdentifier("cameraMonitorViewId",
+                        "id", hardwareMap.appContext.getPackageName());
+        cam = OpenCvCameraFactory.getInstance()
+                .createInternalCamera(
+                        OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
+        cam.setPipeline(this);
+        cam.openCameraDeviceAsync(
+                () -> cam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT)
+        );
+    }
+
+    public Target getTarget() {
+        return target;
+    }
+
+    public void stop() {
+        cam.stopStreaming();
+    }
 }

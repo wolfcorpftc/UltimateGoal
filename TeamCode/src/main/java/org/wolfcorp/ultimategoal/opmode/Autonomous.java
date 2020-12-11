@@ -3,46 +3,32 @@ package org.wolfcorp.ultimategoal.opmode;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvInternalCamera;
+import org.wolfcorp.ultimategoal.vision.OpenCVZoneChooser;
 import org.wolfcorp.ultimategoal.vision.StartingPosition;
 import org.wolfcorp.ultimategoal.vision.Target;
-import org.wolfcorp.ultimategoal.vision.TargetZoneChooser;
-
+import org.wolfcorp.ultimategoal.vision.ZoneChooser;
 
 // TODO: add actual autonomous opmodes
 public abstract class Autonomous extends OpMode {
-    protected OpenCvCamera cam;
-    protected TargetZoneChooser chooser;
+    protected ZoneChooser chooser;
 
     // configration for specific starting positions / plans
     // TODO: figure out the four initialPoses
     protected Pose2d initialPose = new Pose2d();
     protected StartingPosition sp = StartingPosition.UNSET;
 
-    protected void initVision() {
-        int cameraMonitorViewId = hardwareMap.appContext
-                .getResources().getIdentifier("cameraMonitorViewId",
-                        "id", hardwareMap.appContext.getPackageName());
-        cam = OpenCvCameraFactory.getInstance()
-                .createInternalCamera(
-                        OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
-        chooser = new TargetZoneChooser(sp, telemetry);
-        cam.setPipeline(chooser);
-        cam.openCameraDeviceAsync(
-                () -> cam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT)
-        );
-    }
-
     public abstract Vector2d getTargetPos(Target t);
 
     @Override
-    public void runOpMode() throws InterruptedException {
-        initVision();
+    public void runOpMode() {
+        // To change the vision algorithm, change the constructor used
+        chooser = new OpenCVZoneChooser(sp);
+        chooser.init(hardwareMap, telemetry);
         waitForStart();
         Vector2d zonePos = getTargetPos(chooser.getTarget());
+        chooser.stop();
+        // TODO: if we can't ensure the exact position where we place the robot
+        //   we might need to consider ramming against the wall
         drive.follow(drive
                 .from(initialPose)
                 .splineTo(zonePos, initialPose.getHeading())

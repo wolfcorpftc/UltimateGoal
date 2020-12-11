@@ -1,8 +1,8 @@
 package org.wolfcorp.ultimategoal.vision;
 
 public enum Target {
-    A,
-    B,
-    C,
+    A, // None
+    B, // Single
+    C, // Quad
     UNSET
 }

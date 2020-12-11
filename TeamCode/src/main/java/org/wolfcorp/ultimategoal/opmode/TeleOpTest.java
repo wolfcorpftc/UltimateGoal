@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 @TeleOp(name="Current TeleOp", group = "drive")
 public class TeleOpTest extends OpMode {
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Message", "Hello Driver");
         telemetry.update();
@@ -44,8 +44,6 @@ public class TeleOpTest extends OpMode {
             //  (odometry gets more and more inaccurate over time)
 
             drive.update(); // odometry update
-
-
         }
     }
 }
