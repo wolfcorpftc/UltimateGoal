@@ -65,7 +65,9 @@ public class TFODZoneChooser implements ZoneChooser {
     }
 
     public void stop() {
-        tfod.shutdown();
+        if (tfod != null) {
+            tfod.shutdown();
+        }
     }
 
     private void initVuforia() {
