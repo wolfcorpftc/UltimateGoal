@@ -39,7 +39,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-<<<<<<< HEAD:TeamCode/src/main/java/org/wolfcorp/ultimategoal/drive/Drivetrain.java
 import static org.wolfcorp.ultimategoal.drive.DriveConstants.BASE_CONSTRAINTS;
 import static org.wolfcorp.ultimategoal.drive.DriveConstants.MOTOR_VELO_PID;
 import static org.wolfcorp.ultimategoal.drive.DriveConstants.RUN_USING_ENCODER;
@@ -49,26 +48,6 @@ import static org.wolfcorp.ultimategoal.drive.DriveConstants.getMotorVelocityF;
 import static org.wolfcorp.ultimategoal.drive.DriveConstants.kA;
 import static org.wolfcorp.ultimategoal.drive.DriveConstants.kStatic;
 import static org.wolfcorp.ultimategoal.drive.DriveConstants.kV;
-||||||| ac1fb8e:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/SampleMecanumDrive.java
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.BASE_CONSTRAINTS;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MOTOR_VELO_PID;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.RUN_USING_ENCODER;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.TRACK_WIDTH;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.encoderTicksToInches;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.getMotorVelocityF;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kA;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kStatic;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
-=======
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.BASE_CONSTRAINTS;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MOTOR_VELO_PID;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.RUN_USING_ENCODER;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.TRACK_WIDTH;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.encoderTicksToInches;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kA;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kStatic;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
->>>>>>> upstream/master:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/drive/SampleMecanumDrive.java
 
 /*
  * Simple mecanum drive hardware implementation for REV hardware.
