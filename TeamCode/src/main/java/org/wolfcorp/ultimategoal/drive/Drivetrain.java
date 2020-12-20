@@ -31,6 +31,9 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.wolfcorp.ultimategoal.util.AxesSigns;
+import org.wolfcorp.ultimategoal.util.BNO055IMUUtil;
 import org.wolfcorp.ultimategoal.util.DashboardUtil;
 import org.wolfcorp.ultimategoal.util.LynxModuleUtil;
 
@@ -133,14 +136,14 @@ public class Drivetrain extends MecanumDrive {
         }
 
         // TODO: adjust the names of the following hardware devices to match your configuration
-        // imu = hardwareMap.get(BNO055IMU.class, "imu");
-        // BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        // parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-        // imu.initialize(parameters);
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+        imu.initialize(parameters);
 
         // TODO: if your hub is mounted vertically, remap the IMU axes so that the z-axis points
         // upward (normal to the floor) using a command like the following:
-        // BNO055IMUUtil.remapAxes(imu, AxesOrder.XYZ, AxesSigns.NPN);
+        BNO055IMUUtil.remapAxes(imu, AxesOrder.XYZ, AxesSigns.NPN);
 
         leftFront = hardwareMap.get(DcMotorEx.class, "LF");
         leftBack = hardwareMap.get(DcMotorEx.class, "LB");
@@ -170,7 +173,7 @@ public class Drivetrain extends MecanumDrive {
         leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Set up odometry
-        setLocalizer(new ThreeWheelTrackingLocalizer(hardwareMap));
+        //setLocalizer(new ThreeWheelTrackingLocalizer(hardwareMap));
     }
 
     public TrajectoryBuilder from(Pose2d startPose) {
@@ -405,7 +408,7 @@ public class Drivetrain extends MecanumDrive {
 
     @Override
     public double getRawExternalHeading() {
-        return 0 /* imu.getAngularOrientation().firstAngle */;
+        return imu.getAngularOrientation().firstAngle;
     }
 
     public static void normalize(double[] wheelSpeeds) {
