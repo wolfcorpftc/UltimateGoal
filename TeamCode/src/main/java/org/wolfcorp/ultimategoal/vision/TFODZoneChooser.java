@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import java.util.List;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
@@ -23,9 +24,12 @@ public class TFODZoneChooser implements ZoneChooser {
     private HardwareMap hardwareMap;
     Telemetry telemetry;
 
+    private WebcamName webcam;
+
     public void init(HardwareMap hardwareMap, Telemetry telemetry) {
         this.hardwareMap = hardwareMap;
         this.telemetry = telemetry;
+        webcam = hardwareMap.get(WebcamName.class, "Webcam");
 
         // The TFObjectDetector uses the camera frames
         // from the VuforiaLocalizer, so we create that first.
@@ -61,7 +65,7 @@ public class TFODZoneChooser implements ZoneChooser {
                 }
             }
         }
-        return Target.A;
+        return Target.UNSET;
     }
 
     public void stop() {
@@ -78,6 +82,7 @@ public class TFODZoneChooser implements ZoneChooser {
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraDirection = CameraDirection.BACK;
+        parameters.cameraName = webcam;
 
         //  Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
