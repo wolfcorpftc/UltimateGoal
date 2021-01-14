@@ -1,4 +1,4 @@
-package org.wolfcorp.ultimategoal.drive.test;
+package org.wolfcorp.ultimategoal.robot.test;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -6,8 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.wolfcorp.ultimategoal.drive.Drivetrain;
-import org.wolfcorp.ultimategoal.drive.ThreeWheelTrackingLocalizer;
+import org.wolfcorp.ultimategoal.robot.Drivetrain;
 
 /**
  * This is a simple teleop routine for testing localization. Drive the robot around like a normal

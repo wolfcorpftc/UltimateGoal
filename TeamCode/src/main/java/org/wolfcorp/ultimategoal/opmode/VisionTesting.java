@@ -1,14 +1,10 @@
 package org.wolfcorp.ultimategoal.opmode;
 
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.wolfcorp.ultimategoal.drive.Drivetrain;
-import org.wolfcorp.ultimategoal.vision.StartingPosition;
+import org.wolfcorp.ultimategoal.robot.Drivetrain;
 import org.wolfcorp.ultimategoal.vision.TFODZoneChooser;
-import org.wolfcorp.ultimategoal.vision.Target;
 import org.wolfcorp.ultimategoal.vision.ZoneChooser;
 
 // TODO: add actual autonomous opmodes

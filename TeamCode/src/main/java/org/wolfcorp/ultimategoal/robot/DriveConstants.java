@@ -1,4 +1,4 @@
-package org.wolfcorp.ultimategoal.drive;
+package org.wolfcorp.ultimategoal.robot;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.trajectory.constraints.DriveConstraints;

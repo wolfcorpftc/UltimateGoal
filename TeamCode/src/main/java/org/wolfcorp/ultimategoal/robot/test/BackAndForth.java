@@ -1,4 +1,4 @@
-package org.wolfcorp.ultimategoal.drive.test;
+package org.wolfcorp.ultimategoal.robot.test;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.wolfcorp.ultimategoal.drive.Drivetrain;
+import org.wolfcorp.ultimategoal.robot.Drivetrain;
 
 /*
  * Op mode for preliminary tuning of the follower PID coefficients (located in the drive base

@@ -1,4 +1,4 @@
-package org.wolfcorp.ultimategoal.drive;
+package org.wolfcorp.ultimategoal.robot;
 
 import androidx.annotation.NonNull;
 
@@ -42,15 +42,14 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.wolfcorp.ultimategoal.drive.DriveConstants.BASE_CONSTRAINTS;
-import static org.wolfcorp.ultimategoal.drive.DriveConstants.MOTOR_VELO_PID;
-import static org.wolfcorp.ultimategoal.drive.DriveConstants.RUN_USING_ENCODER;
-import static org.wolfcorp.ultimategoal.drive.DriveConstants.TRACK_WIDTH;
-import static org.wolfcorp.ultimategoal.drive.DriveConstants.encoderTicksToInches;
-import static org.wolfcorp.ultimategoal.drive.DriveConstants.getMotorVelocityF;
-import static org.wolfcorp.ultimategoal.drive.DriveConstants.kA;
-import static org.wolfcorp.ultimategoal.drive.DriveConstants.kStatic;
-import static org.wolfcorp.ultimategoal.drive.DriveConstants.kV;
+import static org.wolfcorp.ultimategoal.robot.DriveConstants.BASE_CONSTRAINTS;
+import static org.wolfcorp.ultimategoal.robot.DriveConstants.MOTOR_VELO_PID;
+import static org.wolfcorp.ultimategoal.robot.DriveConstants.RUN_USING_ENCODER;
+import static org.wolfcorp.ultimategoal.robot.DriveConstants.TRACK_WIDTH;
+import static org.wolfcorp.ultimategoal.robot.DriveConstants.encoderTicksToInches;
+import static org.wolfcorp.ultimategoal.robot.DriveConstants.kA;
+import static org.wolfcorp.ultimategoal.robot.DriveConstants.kStatic;
+import static org.wolfcorp.ultimategoal.robot.DriveConstants.kV;
 
 /*
  * Simple mecanum drive hardware implementation for REV hardware.

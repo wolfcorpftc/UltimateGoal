@@ -1,4 +1,4 @@
-package org.wolfcorp.ultimategoal.drive.test;
+package org.wolfcorp.ultimategoal.robot.test;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.wolfcorp.ultimategoal.drive.DriveConstants;
-import org.wolfcorp.ultimategoal.drive.Drivetrain;
+import org.wolfcorp.ultimategoal.robot.DriveConstants;
+import org.wolfcorp.ultimategoal.robot.Drivetrain;
 
 import java.util.Objects;
 

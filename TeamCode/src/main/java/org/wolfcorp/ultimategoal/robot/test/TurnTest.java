@@ -1,10 +1,10 @@
-package org.wolfcorp.ultimategoal.drive.test;
+package org.wolfcorp.ultimategoal.robot.test;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.wolfcorp.ultimategoal.drive.Drivetrain;
+import org.wolfcorp.ultimategoal.robot.Drivetrain;
 
 /*
  * This is a simple routine to test turning capabilities.

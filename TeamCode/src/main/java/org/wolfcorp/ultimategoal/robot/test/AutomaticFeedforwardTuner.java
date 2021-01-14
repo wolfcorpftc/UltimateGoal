@@ -1,4 +1,4 @@
-package org.wolfcorp.ultimategoal.drive.test;
+package org.wolfcorp.ultimategoal.robot.test;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -10,16 +10,16 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.internal.system.Misc;
-import org.wolfcorp.ultimategoal.drive.Drivetrain;
+import org.wolfcorp.ultimategoal.robot.Drivetrain;
 import org.wolfcorp.ultimategoal.util.LoggingUtil;
 import org.wolfcorp.ultimategoal.util.RegressionUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.wolfcorp.ultimategoal.drive.DriveConstants.MAX_RPM;
-import static org.wolfcorp.ultimategoal.drive.DriveConstants.RUN_USING_ENCODER;
-import static org.wolfcorp.ultimategoal.drive.DriveConstants.rpmToVelocity;
+import static org.wolfcorp.ultimategoal.robot.DriveConstants.MAX_RPM;
+import static org.wolfcorp.ultimategoal.robot.DriveConstants.RUN_USING_ENCODER;
+import static org.wolfcorp.ultimategoal.robot.DriveConstants.rpmToVelocity;
 
 /*
  * Op mode for computing kV, kStatic, and kA from various drive routines. For the curious, here's an

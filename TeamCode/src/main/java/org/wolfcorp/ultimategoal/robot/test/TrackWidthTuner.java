@@ -1,4 +1,4 @@
-package org.wolfcorp.ultimategoal.drive.test;
+package org.wolfcorp.ultimategoal.robot.test;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -10,8 +10,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.MovingStatistics;
 
 import org.firstinspires.ftc.robotcore.internal.system.Misc;
-import org.wolfcorp.ultimategoal.drive.DriveConstants;
-import org.wolfcorp.ultimategoal.drive.Drivetrain;
+import org.wolfcorp.ultimategoal.robot.DriveConstants;
+import org.wolfcorp.ultimategoal.robot.Drivetrain;
 
 /*
  * This routine determines the effective track width. The procedure works by executing a point turn

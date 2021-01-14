@@ -1,4 +1,4 @@
-package org.wolfcorp.ultimategoal.drive.test;
+package org.wolfcorp.ultimategoal.robot.test;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.RobotLog;
 
-import org.wolfcorp.ultimategoal.drive.Drivetrain;
-import org.wolfcorp.ultimategoal.drive.ThreeWheelTrackingLocalizer;
+import org.wolfcorp.ultimategoal.robot.Drivetrain;
+import org.wolfcorp.ultimategoal.robot.ThreeWheelTrackingLocalizer;
 
 /**
  * Opmode designed to assist the user in tuning the `StandardTrackingWheelLocalizer`'s
