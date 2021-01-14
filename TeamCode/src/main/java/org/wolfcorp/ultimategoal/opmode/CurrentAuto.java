@@ -11,7 +11,7 @@ import org.wolfcorp.ultimategoal.vision.ZoneChooser;
 
 // TODO: add actual autonomous opmodes
 @Autonomous(name="WCAuto")
-public abstract class WCAuto extends OpMode {
+public abstract class CurrentAuto extends OpMode {
     protected ZoneChooser chooser;
 
     // configration for specific starting positions / plans
