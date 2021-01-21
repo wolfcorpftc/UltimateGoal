@@ -390,11 +390,11 @@ public class Drivetrain extends MecanumDrive {
     }
 
     @Override
-    public void setMotorPowers(double lf, double lb, double rb, double rf) {
-        leftFront.setPower(lf);
+    public void setMotorPowers(double rb, double rf, double lf, double lb) {
         leftBack.setPower(lb);
-        rightBack.setPower(rb);
+        leftFront.setPower(lf);
         rightFront.setPower(rf);
+        rightBack.setPower(rb);
     }
 
     public void setMotorPowers(double v) {
@@ -424,13 +424,13 @@ public class Drivetrain extends MecanumDrive {
         }
     }
 
-    public void drive(double x, double y, double rotation) {
+    public void drive(double x, double y, double rotation, double slowModeMultiplier, boolean slowModeCondition) {
         double[] wheelSpeeds = new double[4];
 
-        wheelSpeeds[0] = x + y + rotation; // LF
-        wheelSpeeds[1] = x - y - rotation; // RF
-        wheelSpeeds[2] = x - y + rotation; // LB
-        wheelSpeeds[3] = x + y - rotation; // RB
+        wheelSpeeds[0] = x + y + rotation; // RB
+        wheelSpeeds[1] = x - y - rotation; // LB
+        wheelSpeeds[2] = x - y + rotation; // RF
+        wheelSpeeds[3] = x + y - rotation; // LF
         normalize(wheelSpeeds);
 
         for (int i = 0; i < 4; i++)
@@ -438,7 +438,7 @@ public class Drivetrain extends MecanumDrive {
         normalize(wheelSpeeds);
 
         for (int i = 0; i < 4; i++)
-            wheelSpeeds[i] *= speedMultiplier;
+            wheelSpeeds[i] *= speedMultiplier * (slowModeCondition ? slowModeMultiplier : 1);
 
         setMotorPowers(wheelSpeeds[0], wheelSpeeds[2], wheelSpeeds[3], wheelSpeeds[1]);
     }

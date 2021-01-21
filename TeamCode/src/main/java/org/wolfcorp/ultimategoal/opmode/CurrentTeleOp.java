@@ -25,7 +25,7 @@ public class CurrentTeleOp extends LinearOpMode {
             // Drivetrain
             drive.drive(-gamepad1.right_stick_y,
                     gamepad1.right_stick_x,
-                    gamepad1.left_stick_x * 0.9);
+                    gamepad1.left_stick_x * 0.9, 0.25, gamepad1.right_bumper);
 
             // Drivetrain speeds
             if (gamepad1.left_bumper && gamepad1.right_bumper) {
@@ -39,23 +39,28 @@ public class CurrentTeleOp extends LinearOpMode {
             }
 
             // Reversing scoring mechanisms
-            scorer.reverse(gamepad1.right_bumper, 200);
+            scorer.reverse(gamepad1.b, 200);
 
             // Intake
-            scorer.intakeToggle(gamepad1.a && !gamepad1.start, 1, 200);
+            scorer.toggleIntake(gamepad1.a && !gamepad1.start, 1, 200);
 
             // Outtake
-            scorer.outtakeToggle(gamepad1.y, 0.4, 200);
+            scorer.toggleStopper(gamepad1.dpad_left, gamepad1.dpad_right, 200);
+            scorer.toggleOuttake(gamepad1.y, 200);
 
             // Wobble Goal
-            scorer.wobbleGripper(gamepad1.dpad_down, 200);
-            scorer.wobbleArm(gamepad1.left_bumper);
+            scorer.wobbleGripper(gamepad1.left_bumper, 200);
+            scorer.wobbleArm(gamepad1.dpad_down, gamepad1.dpad_up);
+
+            telemetry.addData("outtakeSpeed", scorer.outtake.getVelocity());
+            telemetry.update();
 
             // TODO: add driver assist (auto-shoot using odom)
             // TODO: add button for manually resetting encoders after banging against wall
             //  (odometry gets more and more inaccurate over time)
 
             drive.update(); // odometry update
+            sleep(20);
         }
     }
 }

@@ -1,19 +1,22 @@
 package org.wolfcorp.ultimategoal.robot;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import static java.lang.Thread.sleep;
 
 public class Scorer {
     public DcMotorEx intake, outtake, arm;
     public Servo gripper, stopper;
 
     public boolean reverse = false;
-    public boolean pastDirectionUp = false;
 
     private ElapsedTime intakeDelay = new ElapsedTime();
     private ElapsedTime outtakeDelay = new ElapsedTime();
+    private ElapsedTime stopperDelay = new ElapsedTime();
     private ElapsedTime gripperDelay = new ElapsedTime();
     private ElapsedTime reverseDelay = new ElapsedTime();
 
@@ -21,23 +24,48 @@ public class Scorer {
         intake = hardwareMap.get(DcMotorEx.class, "intake");
         outtake = hardwareMap.get(DcMotorEx.class, "outtake");
         arm = hardwareMap.get(DcMotorEx.class, "arm");
+        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         gripper = hardwareMap.get(Servo.class, "gripper");
         stopper = hardwareMap.get(Servo.class, "stopper");
     }
 
-    public void intakeToggle(boolean condition, double speed, int toggleDelay) {
+    public void toggleIntake(boolean condition, double speed, int toggleDelay) {
         if (condition && intakeDelay.milliseconds() > toggleDelay) {
             intake.setPower(intake.getPower() == 0 ? speed * (reverse ? 1 : -1) : 0);
             intakeDelay.reset();
+        } else {
+            intake.setPower(intake.getPower() * (reverse ? 1 : -1));
         }
     }
 
     //TODO: Have to wait a bit after setting power, then also have to move stopper to correct position
-    public void outtakeToggle(boolean condition, double speed, int toggleDelay) {
+    public void toggleOuttake(boolean condition, int toggleDelay) {
         if (condition && outtakeDelay.milliseconds() > toggleDelay) {
-            outtake.setPower(outtake.getPower() == 0 ? speed * (reverse ? -1 : 1) : 0);
+            outtake.setPower(outtake.getPower() == 0 ? 0.8 : 0);
+            stopper.setPosition(0.34);
             outtakeDelay.reset();
+        }
+    }
+
+    public void toggleStopper(boolean manualCondition, boolean automaticCondition, int toggleDelay) {
+        if ((manualCondition || automaticCondition) && stopperDelay.milliseconds() > toggleDelay) {
+            int amount = manualCondition ? 1 : 3;
+            for (int i = 0; i < amount; i++) {
+                stopper.setPosition(0.02);
+                try {
+                    sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                stopper.setPosition(0.34);
+                try {
+                    sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            stopperDelay.reset();
         }
     }
 
@@ -48,9 +76,11 @@ public class Scorer {
         }
     }
 
-    public void wobbleArm(boolean condition) {
-        if (condition) {
-            arm.setPower(0.5 * (reverse ? -1 : 1));
+    public void wobbleArm(boolean conditionUp, boolean conditionDown) {
+        if (conditionUp) {
+            arm.setPower(0.5);
+        } else if (conditionDown) {
+            arm.setPower(-0.5);
         } else {
             arm.setPower(0);
         }
@@ -59,8 +89,6 @@ public class Scorer {
     public void reverse(boolean condition, int toggleDelay) {
         if (condition && reverseDelay.milliseconds() > toggleDelay) {
             reverse = !reverse;
-            intake.setPower(intake.getPower() != 0 ? intake.getPower() * (reverse ? 1 : -1) : 0);
-            outtake.setPower(outtake.getPower() != 0 ? outtake.getPower() * (reverse ? 1 : -1) : 0);
             reverseDelay.reset();
         }
     }
