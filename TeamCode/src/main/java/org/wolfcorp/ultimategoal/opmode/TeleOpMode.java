@@ -21,11 +21,13 @@ public class TeleOpMode extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
+        scorer.openRelease();
+
         while (opModeIsActive()) {
             // Drivetrain
             drive.drive(-gamepad1.right_stick_y,
                     gamepad1.right_stick_x,
-                    gamepad1.left_stick_x * 0.8, 0.25, gamepad1.right_bumper);
+                    gamepad1.left_stick_x * 0.8, 0.75, 0.5, 0.8, gamepad1.right_bumper);
 
             // Drivetrain speeds
             if (gamepad1.left_bumper && gamepad1.right_bumper) {

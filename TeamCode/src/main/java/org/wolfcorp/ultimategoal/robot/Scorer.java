@@ -10,7 +10,7 @@ import static java.lang.Thread.sleep;
 
 public class Scorer {
     public DcMotorEx intake, outtake, arm;
-    public Servo gripper, stopper;
+    public Servo gripper, stopper, release;
 
     public boolean reverse = false;
 
@@ -27,6 +27,7 @@ public class Scorer {
         arm = hardwareMap.get(DcMotorEx.class, "arm");
         arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        release = hardwareMap.get(Servo.class, "release");
         gripper = hardwareMap.get(Servo.class, "gripper");
         stopper = hardwareMap.get(Servo.class, "stopper");
     }
@@ -146,5 +147,9 @@ public class Scorer {
 
     public void stopperClose() {
         stopper.setPosition(0.34);
+    }
+
+    public void openRelease() {
+        release.setPosition(0.5);
     }
 }

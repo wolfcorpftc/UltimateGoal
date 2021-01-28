@@ -4,17 +4,20 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.wolfcorp.ultimategoal.robot.Drivetrain;
 import org.wolfcorp.ultimategoal.robot.Scorer;
 
 @Autonomous(name="WCAuto")
-public class AutoMode extends OpMode {
+public class AutoMode extends LinearOpMode {
     //protected ZoneChooser chooser;
 
     protected Pose2d initialPose = new Pose2d(-65, 48, Math.toRadians(0));
 
     @Override
     public void runOpMode() {
+        Drivetrain drive = new Drivetrain(hardwareMap);
         // To change the vision algorithm, change the constructor used
         //chooser = new TFODZoneChooser();
         //chooser.init(hardwareMap, telemetry);
@@ -36,7 +39,7 @@ public class AutoMode extends OpMode {
                 .lineToLinearHeading(new Pose2d(-18, 54, Math.toRadians(-30)))
                 .build();
 
-        Trajectory traj1Shoot = drive
+/*        Trajectory traj1Shoot = drive
                 .from(traj1.end())
                 .addTemporalMarker(0.0, scorer::outtakeOn)
                 .addTemporalMarker(0.0, scorer::stopperOpen)
@@ -46,11 +49,11 @@ public class AutoMode extends OpMode {
                 .addTemporalMarker(0.8, scorer::stopperOpen)
                 .addTemporalMarker(1.0, scorer::stopperClose)
                 .addTemporalMarker(1.0, scorer::outtakeOff)
-                .build();
+                .build();*/
 
         // Shoot -> drop wobble goal
         // furthest zone : new Pose2d(48, 56, Math.toRadians(90)
-        Trajectory traj2 = drive.from(traj1Shoot.end())
+        Trajectory traj2 = drive.from(traj1.end())
                 .splineToSplineHeading(new Pose2d(48, 56, Math.toRadians(90)), Math.toRadians(0))
                 .build();
 
@@ -85,10 +88,11 @@ public class AutoMode extends OpMode {
                 .build();
 
         waitForStart();
+        scorer.gripperClose();
 
         // Move a bit and shoot (high goal)
         drive.follow(traj1);
-        drive.follow(traj1Shoot);
+        //drive.follow(traj1Shoot);
 
         // Drop the wobble goal (in Zone C for now)
         drive.follow(traj2);

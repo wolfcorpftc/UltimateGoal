@@ -57,11 +57,11 @@ import static org.wolfcorp.ultimategoal.robot.DriveConstants.kV;
 @Config
 public class Drivetrain extends MecanumDrive {
 
-    public static double TKP = 0;
+    public static double TKP = 20;
     public static double TKI = 0;
-    public static double TKD = 0;
+    public static double TKD = 1;
 
-    public static double HKP = 8;
+    public static double HKP = 5;
     public static double HKI = 0;
     public static double HKD = 0;
 
@@ -176,7 +176,7 @@ public class Drivetrain extends MecanumDrive {
     }
 
     public TrajectoryBuilder from(Pose2d startPose) {
-        return new TrajectoryBuilder(startPose, constraints);
+        return new TrajectoryBuilder(startPose, true, constraints);
     }
 
     public TrajectoryBuilder from(Pose2d startPose, boolean reversed) {
@@ -424,13 +424,14 @@ public class Drivetrain extends MecanumDrive {
         }
     }
 
-    public void drive(double x, double y, double rotation, double slowModeMultiplier, boolean slowModeCondition) {
+    public void drive(double x, double y, double rotation, double smX, double smY, double smH, boolean slowModeCondition) {
+
         double[] wheelSpeeds = new double[4];
 
-        wheelSpeeds[0] = x + y + rotation; // LF
-        wheelSpeeds[1] = x - y - rotation; // RF
-        wheelSpeeds[2] = x - y + rotation; // LB
-        wheelSpeeds[3] = x + y - rotation; // RB
+        wheelSpeeds[0] = x * (slowModeCondition ? smX : 1) + y * (slowModeCondition ? smY : 1) + rotation * (slowModeCondition ? smH : 1); // LF
+        wheelSpeeds[1] = x * (slowModeCondition ? smX : 1) - y * (slowModeCondition ? smY : 1) - rotation * (slowModeCondition ? smH : 1); // RF
+        wheelSpeeds[2] = x * (slowModeCondition ? smX : 1)- y * (slowModeCondition ? smY : 1) + rotation * (slowModeCondition ? smH : 1); // LB
+        wheelSpeeds[3] = x * (slowModeCondition ? smX : 1) + y * (slowModeCondition ? smY : 1) - rotation * (slowModeCondition ? smH : 1); // RB
         normalize(wheelSpeeds);
 
         for (int i = 0; i < 4; i++)
@@ -438,7 +439,7 @@ public class Drivetrain extends MecanumDrive {
         normalize(wheelSpeeds);
 
         for (int i = 0; i < 4; i++)
-            wheelSpeeds[i] *= speedMultiplier * (slowModeCondition ? slowModeMultiplier : 1);
+            wheelSpeeds[i] *= speedMultiplier;
 
         setMotorPowers(wheelSpeeds[0], wheelSpeeds[2], wheelSpeeds[3], wheelSpeeds[1]);
     }
