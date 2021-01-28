@@ -168,8 +168,8 @@ public class Drivetrain extends MecanumDrive {
         }
 
         // TODO: reverse any motors using DcMotor.setDirection()
-        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Set up odometry
         //setLocalizer(new ThreeWheelTrackingLocalizer(hardwareMap));
@@ -390,7 +390,7 @@ public class Drivetrain extends MecanumDrive {
     }
 
     @Override
-    public void setMotorPowers(double rb, double rf, double lf, double lb) {
+    public void setMotorPowers(double lf, double lb, double rb, double rf) {
         leftBack.setPower(lb);
         leftFront.setPower(lf);
         rightFront.setPower(rf);
@@ -427,10 +427,10 @@ public class Drivetrain extends MecanumDrive {
     public void drive(double x, double y, double rotation, double slowModeMultiplier, boolean slowModeCondition) {
         double[] wheelSpeeds = new double[4];
 
-        wheelSpeeds[0] = x + y + rotation; // RB
-        wheelSpeeds[1] = x - y - rotation; // LB
-        wheelSpeeds[2] = x - y + rotation; // RF
-        wheelSpeeds[3] = x + y - rotation; // LF
+        wheelSpeeds[0] = x + y + rotation; // LF
+        wheelSpeeds[1] = x - y - rotation; // RF
+        wheelSpeeds[2] = x - y + rotation; // LB
+        wheelSpeeds[3] = x + y - rotation; // RB
         normalize(wheelSpeeds);
 
         for (int i = 0; i < 4; i++)

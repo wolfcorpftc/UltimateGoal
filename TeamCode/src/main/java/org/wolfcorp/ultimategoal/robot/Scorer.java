@@ -35,14 +35,14 @@ public class Scorer {
             intake.setPower(intake.getPower() == 0 ? speed * (reverse ? 1 : -1) : 0);
             intakeDelay.reset();
         } else {
-            intake.setPower(intake.getPower() * (reverse ? 1 : -1));
+            intake.setPower(intake.getPower() != 0 ? speed * (reverse ? 1 : -1) : 0);
         }
     }
 
     //TODO: Have to wait a bit after setting power, then also have to move stopper to correct position
     public void toggleOuttake(boolean condition, int toggleDelay) {
         if (condition && outtakeDelay.milliseconds() > toggleDelay) {
-            outtake.setPower(outtake.getPower() == 0 ? 0.8 : 0);
+            outtake.setVelocity(outtake.getVelocity() == 0 ? 1680 : 0);
             stopper.setPosition(0.34);
             outtakeDelay.reset();
         }
