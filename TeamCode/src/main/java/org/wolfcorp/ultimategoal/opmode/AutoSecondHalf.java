@@ -32,50 +32,51 @@ public class AutoSecondHalf extends LinearOpMode {
 
         drive.setPoseEstimate(startPose);
 
+        //Path to near wobble goal
         Trajectory traj1 = drive.from(startPose)
                 .splineTo(new Vector2d(-48, -36), Math.toRadians(0))
                 .build();
 
+        //Path to wobble goal
         Trajectory traj2 = drive.from(traj1.end())
                 .splineTo(new Vector2d(-48, -30), Math.toRadians(0))
                 .build();
 
+        //Path to Zone C
         Trajectory traj3 = drive.from(traj2.end())
                 .splineTo(new Vector2d(48, -60), Math.toRadians(-90))
                 .build();
 
+        //Path to Park
         Trajectory traj4 = drive.from(traj3.end())
                 .splineTo(new Vector2d(12, -60), Math.toRadians(0))
                 .build();
 
         waitForStart();
 
+        //Drive near wobble goal
         drive.follow(traj1);
 
+        //Lower wobble arm
         scorer.gripperOpen();
-
         scorer.armDown();
 
+        //Drive to wobble goal
         drive.follow(traj2);
 
+        //Grab wobble goal
         scorer.gripperClose();
-
         scorer.armUp();
 
+        //Drive to Zone C
         drive.follow(traj3);
 
+        //Dropping wobble goal
         scorer.armDown();
-
         scorer.gripperOpen();
+        scorer.armUp();
 
+        //Parking maneuver
         drive.follow(traj4);
-
-
-        // TODO: drop goal
-        // TODO: maybe reset by banging against wall
-        // TODO: power shot one-by-one
-        // TODO: depending on vision result, pick up starter stack
-        //  and aim for the high goal
-        // TODO: park
     }
 }

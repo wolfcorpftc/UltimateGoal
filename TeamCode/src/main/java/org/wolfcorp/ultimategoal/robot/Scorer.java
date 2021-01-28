@@ -95,10 +95,16 @@ public class Scorer {
     }
     public void gripperOpen(){
         gripper.setPosition(0.42);
+        while(autoArm.milliseconds()<1000){
+
+        }
     }
 
     public void gripperClose(){
         gripper.setPosition(0.8);
+        while(autoArm.milliseconds()<1000){
+
+        }
     }
 
     public void armDown(){
