@@ -19,6 +19,7 @@ public class Scorer {
     private ElapsedTime stopperDelay = new ElapsedTime();
     private ElapsedTime gripperDelay = new ElapsedTime();
     private ElapsedTime reverseDelay = new ElapsedTime();
+    private ElapsedTime autoArm = new ElapsedTime();
 
     public Scorer(HardwareMap hardwareMap) {
         intake = hardwareMap.get(DcMotorEx.class, "intake");
@@ -92,4 +93,36 @@ public class Scorer {
             reverseDelay.reset();
         }
     }
+    public void gripperOpen(){
+        gripper.setPosition(0.42);
+        while(autoArm.milliseconds()<1000){
+
+        }
+    }
+
+    public void gripperClose(){
+        gripper.setPosition(0.8);
+        while(autoArm.milliseconds()<1000){
+
+        }
+    }
+
+    public void armDown(){
+        autoArm.reset();
+        arm.setPower(-0.5);
+        while(autoArm.milliseconds()<2000){
+
+        }
+        arm.setPower(0);
+    }
+
+    public void armUp(){
+        autoArm.reset();
+        arm.setPower(0.5);
+        while(autoArm.milliseconds()<2000){
+
+        }
+        arm.setPower(0);
+    }
+
 }
