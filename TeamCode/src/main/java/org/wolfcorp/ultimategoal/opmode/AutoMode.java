@@ -49,22 +49,27 @@ public class AutoMode extends OpMode {
 
         // Path to near wobble goal
         Trajectory traj4 = drive.from(traj3.end())
-                .splineTo(new Vector2d(-48, -36), Math.toRadians(0))
+                .splineTo(new Vector2d(-24, 10), Math.toRadians(0))
+                .build();
+
+        // Path to nearer wobble goal
+        Trajectory traj5 = drive.from(traj4.end())
+                .splineTo(new Vector2d(-48, 10), Math.toRadians(0))
                 .build();
 
         // Path to wobble goal
-        Trajectory traj5 = drive.from(traj4.end())
-                .splineTo(new Vector2d(-48, -30), Math.toRadians(0))
+        Trajectory traj6 = drive.from(traj5.end())
+                .splineTo(new Vector2d(-48, 22), Math.toRadians(0))
                 .build();
 
         // Path to Zone C
-        Trajectory traj6 = drive.from(traj5.end())
-                .splineTo(new Vector2d(48, -60), Math.toRadians(-90))
+        Trajectory traj7 = drive.from(traj6.end())
+                .splineTo(new Vector2d(48, 60), Math.toRadians(90))
                 .build();
 
         // Path to Park
-        Trajectory traj7 = drive.from(traj6.end())
-                .splineTo(new Vector2d(12, -60), Math.toRadians(0))
+        Trajectory traj8 = drive.from(traj7.end())
+                .splineTo(new Vector2d(12, 60), Math.toRadians(0))
                 .build();
 
         waitForStart();
