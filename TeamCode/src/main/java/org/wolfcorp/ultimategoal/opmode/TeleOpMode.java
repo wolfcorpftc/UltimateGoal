@@ -9,7 +9,7 @@ import org.wolfcorp.ultimategoal.robot.Scorer;
 
 @Config
 @TeleOp(name="Current TeleOp", group = "drive")
-public class CurrentTeleOp extends LinearOpMode {
+public class TeleOpMode extends LinearOpMode {
     @Override
     public void runOpMode() {
         Drivetrain drive = new Drivetrain(hardwareMap);

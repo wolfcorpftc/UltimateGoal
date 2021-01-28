@@ -93,6 +93,7 @@ public class Scorer {
             reverseDelay.reset();
         }
     }
+
     public void gripperOpen(){
         gripper.setPosition(0.42);
         while(autoArm.milliseconds()<1000){
@@ -125,4 +126,15 @@ public class Scorer {
         arm.setPower(0);
     }
 
+    public void intake(int millisDuration) {
+        intake.setPower(1);
+        try { sleep(millisDuration); } catch(Exception e) {}
+        intake.setPower(0);
+    }
+
+    public void outtake(int millisDuration) {
+        outtake.setPower(1);
+        try { sleep(millisDuration); } catch (Exception e) {}
+        outtake.setPower(0);
+    }
 }
