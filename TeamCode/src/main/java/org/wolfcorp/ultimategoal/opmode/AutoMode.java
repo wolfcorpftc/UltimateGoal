@@ -89,20 +89,21 @@ public class AutoMode extends OpMode {
 
         // Drive near wobble goal
         drive.follow(traj4);
+        drive.follow(traj5);
 
         // Lower wobble arm
         scorer.gripperOpen();
         scorer.armDown();
 
         // Drive to wobble goal
-        drive.follow(traj5);
+        drive.follow(traj6);
 
         // Grab wobble goal
         scorer.gripperClose();
         scorer.armUp();
 
         // Drive to Zone C
-        drive.follow(traj6);
+        drive.follow(traj7);
 
         // Dropping wobble goal
         scorer.armDown();
@@ -110,6 +111,6 @@ public class AutoMode extends OpMode {
         scorer.armUp();
 
         // Parking maneuver
-        drive.follow(traj7);
+        drive.follow(traj8);
     }
 }
