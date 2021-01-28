@@ -36,9 +36,21 @@ public class AutoMode extends OpMode {
                 .lineToLinearHeading(new Pose2d(-18, 54, Math.toRadians(-30)))
                 .build();
 
+        Trajectory traj1Shoot = drive
+                .from(traj1.end())
+                .addTemporalMarker(0.0, scorer::outtakeOn)
+                .addTemporalMarker(0.0, scorer::stopperOpen)
+                .addTemporalMarker(0.2, scorer::stopperClose)
+                .addTemporalMarker(0.4, scorer::stopperOpen)
+                .addTemporalMarker(0.6, scorer::stopperClose)
+                .addTemporalMarker(0.8, scorer::stopperOpen)
+                .addTemporalMarker(1.0, scorer::stopperClose)
+                .addTemporalMarker(1.0, scorer::outtakeOff)
+                .build();
+
         // Shoot -> drop wobble goal
         // furthest zone : new Pose2d(48, 56, Math.toRadians(90)
-        Trajectory traj2 = drive.from(traj1.end())
+        Trajectory traj2 = drive.from(traj1Shoot.end())
                 .splineToSplineHeading(new Pose2d(48, 56, Math.toRadians(90)), Math.toRadians(0))
                 .build();
 
@@ -76,7 +88,7 @@ public class AutoMode extends OpMode {
 
         // Move a bit and shoot (high goal)
         drive.follow(traj1);
-        scorer.outtake(500);
+        drive.follow(traj1Shoot);
 
         // Drop the wobble goal (in Zone C for now)
         drive.follow(traj2);

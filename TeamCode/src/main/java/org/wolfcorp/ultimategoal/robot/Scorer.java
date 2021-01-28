@@ -132,9 +132,19 @@ public class Scorer {
         intake.setPower(0);
     }
 
-    public void outtake(int millisDuration) {
+    public void outtakeOn() {
         outtake.setPower(1);
-        try { sleep(millisDuration); } catch (Exception e) {}
+    }
+
+    public void outtakeOff() {
         outtake.setPower(0);
+    }
+
+    public void stopperOpen() {
+        stopper.setPosition(0.02);
+    }
+
+    public void stopperClose() {
+        stopper.setPosition(0.34);
     }
 }
