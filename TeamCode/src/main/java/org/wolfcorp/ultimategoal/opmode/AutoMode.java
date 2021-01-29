@@ -48,7 +48,7 @@ public class AutoMode extends LinearOpMode {
 
         // Drop -> pick up rings
         Trajectory traj3 = drive.from(traj2.end())
-                .splineToSplineHeading(new Pose2d(-24, 36, Math.toRadians(-30)), Math.toRadians(0))
+                .lineToLinearHeading(new Pose2d(-24, 36, Math.toRadians(30)))
                 .build();
 
         // Path to near wobble goal
@@ -83,7 +83,7 @@ public class AutoMode extends LinearOpMode {
         drive.follow(traj1);
         scorer.outtakeOn();
         for (int i = 0; i < 3; i++) {
-            sleep(200);
+            sleep(300);
             scorer.stopperOpen();
             sleep(200);
             scorer.stopperClose();
