@@ -53,27 +53,22 @@ public class AutoMode extends LinearOpMode {
 
         // Path to near wobble goal
         Trajectory traj4 = drive.from(traj3.end())
-                .splineTo(new Vector2d(-24, 10), Math.toRadians(0))
-                .build();
-
-        // Path to nearer wobble goal
-        Trajectory traj5 = drive.from(traj4.end())
-                .splineTo(new Vector2d(-48, 10), Math.toRadians(0))
+                .lineToLinearHeading(new Pose2d(-48, 42, Math.toRadians(180)))
                 .build();
 
         // Path to wobble goal
-        Trajectory traj6 = drive.from(traj5.end())
-                .splineTo(new Vector2d(-48, 22), Math.toRadians(0))
+        Trajectory traj5 = drive.from(traj4.end())
+                .lineToLinearHeading(new Pose2d(-48, 38, Math.toRadians(180)))
                 .build();
 
         // Path to Zone C
-        Trajectory traj7 = drive.from(traj6.end())
-                .splineTo(new Vector2d(48, 60), Math.toRadians(90))
+        Trajectory traj6 = drive.from(traj5.end())
+                .lineToLinearHeading(new Pose2d(48, 60, Math.toRadians(-90)))
                 .build();
 
         // Path to Park
-        Trajectory traj8 = drive.from(traj7.end())
-                .splineTo(new Vector2d(12, 60), Math.toRadians(0))
+        Trajectory traj7 = drive.from(traj6.end())
+                .lineToLinearHeading(new Pose2d(12, 60, Math.toRadians(0)))
                 .build();
 
         waitForStart();
@@ -101,21 +96,20 @@ public class AutoMode extends LinearOpMode {
 
         // Drive near wobble goal
         drive.follow(traj4);
-        drive.follow(traj5);
 
         // Lower wobble arm
         scorer.gripperOpen();
         scorer.armDown();
 
         // Drive to wobble goal
-        drive.follow(traj6);
+        drive.follow(traj5);
 
         // Grab wobble goal
         scorer.gripperClose();
         scorer.armUp();
 
         // Drive to Zone C
-        drive.follow(traj7);
+        drive.follow(traj6);
 
         // Dropping wobble goal
         scorer.armDown();
@@ -123,6 +117,6 @@ public class AutoMode extends LinearOpMode {
         scorer.armUp();
 
         // Parking maneuver
-        drive.follow(traj8);
+        drive.follow(traj7);
     }
 }
