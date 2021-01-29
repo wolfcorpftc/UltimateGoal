@@ -128,11 +128,11 @@ public class Scorer {
     }
 
     public void outtakeOn() {
-        outtake.setPower(1);
+        outtake.setVelocity(1450);
     }
 
     public void outtakeOff() {
-        outtake.setPower(0);
+        outtake.setVelocity(0);
     }
 
     public void stopperOpen() {
