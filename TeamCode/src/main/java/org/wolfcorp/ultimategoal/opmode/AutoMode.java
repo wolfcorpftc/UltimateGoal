@@ -34,9 +34,10 @@ public class AutoMode extends LinearOpMode {
 
         drive.setPoseEstimate(initialPose);
 
+        // Move and shoot
         Trajectory traj1 = drive
                 .from(initialPose)
-                .lineToLinearHeading(new Pose2d(-18, 54, Math.toRadians(-30)))
+                .lineToLinearHeading(new Pose2d(-18, 54, Math.toRadians(-10)))
                 .build();
 
         // Shoot -> drop wobble goal
@@ -78,7 +79,7 @@ public class AutoMode extends LinearOpMode {
         waitForStart();
         scorer.gripperClose();
 
-        // Move a bit and shoot (high goal)
+        // Move and shoot (high goal)
         drive.follow(traj1);
         scorer.outtakeOn();
         for (int i = 0; i < 3; i++) {
