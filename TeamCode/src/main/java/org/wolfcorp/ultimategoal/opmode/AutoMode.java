@@ -39,22 +39,10 @@ public class AutoMode extends LinearOpMode {
                 .lineToLinearHeading(new Pose2d(-18, 54, Math.toRadians(-30)))
                 .build();
 
-/*        Trajectory traj1Shoot = drive
-                .from(traj1.end())
-                .addTemporalMarker(0.0, scorer::outtakeOn)
-                .addTemporalMarker(0.0, scorer::stopperOpen)
-                .addTemporalMarker(0.2, scorer::stopperClose)
-                .addTemporalMarker(0.4, scorer::stopperOpen)
-                .addTemporalMarker(0.6, scorer::stopperClose)
-                .addTemporalMarker(0.8, scorer::stopperOpen)
-                .addTemporalMarker(1.0, scorer::stopperClose)
-                .addTemporalMarker(1.0, scorer::outtakeOff)
-                .build();*/
-
         // Shoot -> drop wobble goal
         // furthest zone : new Pose2d(48, 56, Math.toRadians(90)
         Trajectory traj2 = drive.from(traj1.end())
-                .splineToSplineHeading(new Pose2d(48, 56, Math.toRadians(90)), Math.toRadians(0))
+                .lineToLinearHeading(new Pose2d(48, 56, Math.toRadians(-90)))
                 .build();
 
         // Drop -> pick up rings
@@ -92,7 +80,14 @@ public class AutoMode extends LinearOpMode {
 
         // Move a bit and shoot (high goal)
         drive.follow(traj1);
-        //drive.follow(traj1Shoot);
+        scorer.outtakeOn();
+        for (int i = 0; i < 3; i++) {
+            sleep(200);
+            scorer.stopperOpen();
+            sleep(200);
+            scorer.stopperClose();
+        }
+        scorer.outtakeOff();
 
         // Drop the wobble goal (in Zone C for now)
         drive.follow(traj2);
