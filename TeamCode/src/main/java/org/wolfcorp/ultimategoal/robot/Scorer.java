@@ -98,34 +98,26 @@ public class Scorer {
     public void gripperOpen(){
         gripper.setPosition(0.8);
         autoArm.reset();
-        while(autoArm.milliseconds()<1000){
-
-        }
+        while (autoArm.milliseconds()<1000);
     }
 
     public void gripperClose(){
         gripper.setPosition(0.42);
         autoArm.reset();
-        while(autoArm.milliseconds()<1000){
-
-        }
+        while (autoArm.milliseconds()<1000);
     }
 
     public void armDown(){
         arm.setPower(-0.5);
         autoArm.reset();
-        while(autoArm.milliseconds()<2000){
-
-        }
+        while (autoArm.milliseconds()<2000);
         arm.setPower(0);
     }
 
     public void armUp(){
         arm.setPower(0.5);
         autoArm.reset();
-        while(autoArm.milliseconds()<2000){
-
-        }
+        while (autoArm.milliseconds()<2000);
         arm.setPower(0);
     }
 
