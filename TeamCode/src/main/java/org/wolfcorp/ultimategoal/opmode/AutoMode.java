@@ -73,6 +73,7 @@ public class AutoMode extends LinearOpMode {
 
         waitForStart();
         scorer.gripperClose();
+        scorer.openRelease();
 
         // Move and shoot (high goal)
         drive.follow(traj1);
@@ -87,8 +88,9 @@ public class AutoMode extends LinearOpMode {
 
         // Drop the wobble goal (in Zone C for now)
         drive.follow(traj2);
-        scorer.armUp();
+        scorer.armDown();
         scorer.gripperOpen();
+        scorer.armUp();
 
         // Go back to pick up the rings
         drive.follow(traj3);
@@ -98,8 +100,8 @@ public class AutoMode extends LinearOpMode {
         drive.follow(traj4);
 
         // Lower wobble arm
-        scorer.armDown();
         scorer.gripperOpen();
+        scorer.armDown();
 
         // Drive to wobble goal
         drive.follow(traj5);
