@@ -26,19 +26,21 @@ public class OpenCVZoneChooser extends OpenCvPipeline implements ZoneChooser {
 
     public OpenCVZoneChooser(StartingPosition sp) {
         // TODO: tune the rectangles
-        switch (sp) {
-            case BL: ROI = new Rect(new Point(60, 35), new Point(120, 75)); break;
-            case BR: ROI = new Rect(new Point(60, 35), new Point(120, 75)); break;
-            case RL: ROI = new Rect(new Point(60, 35), new Point(120, 75)); break;
-            case RR: ROI = new Rect(new Point(60, 35), new Point(120, 75)); break;
-        }
+//        switch (sp) {
+//            case BL: ROI = new Rect(new Point(60, 35), new Point(120, 75)); break;
+//            case BR: ROI = new Rect(new Point(60, 35), new Point(120, 75)); break;
+//            case RL: ROI = new Rect(new Point(60, 35), new Point(120, 75)); break;
+//            case RR: ROI = new Rect(new Point(60, 35), new Point(120, 75)); break;
+//        }
+        ROI = new Rect(new Point(60, 35), new Point(120, 75));
     }
 
     public Mat processFrame(Mat input) {
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
+        // Note that OpenCV HSV hue ranges from [0, 179], not [0, 359]
         // TODO: tune color
-        Scalar lowHSV = new Scalar(23, 50, 70);
-        Scalar highHSV = new Scalar(32, 255, 255);
+        Scalar lowHSV = new Scalar(30 / 2.0, 150, 153);
+        Scalar highHSV = new Scalar(44 / 2.0, 255, 255);
 
         Core.inRange(mat, lowHSV, highHSV, mat);
         Mat ringArea = mat.submat(ROI);
