@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -78,8 +79,8 @@ public class OpenCVZoneChooser extends OpenCvPipeline implements ZoneChooser {
                 .getResources().getIdentifier("cameraMonitorViewId",
                         "id", hardwareMap.appContext.getPackageName());
         cam = OpenCvCameraFactory.getInstance()
-                .createInternalCamera(
-                        OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
+                .createWebcam(
+                        hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         cam.setPipeline(this);
         cam.openCameraDeviceAsync(
                 () -> cam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT)
