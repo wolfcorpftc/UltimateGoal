@@ -17,7 +17,7 @@ public class TFODZoneChooser implements ZoneChooser {
     private static final String LABEL_FIRST_ELEMENT = "Quad";
     private static final String LABEL_SECOND_ELEMENT = "Single";
     private static final String VUFORIA_KEY = Secrets.WC_VUFORIA_KEY;
-    private static final float MIN_CONFIDENCE = 0.8f;
+    private static final float MIN_CONFIDENCE = 0.4f;
 
     private VuforiaLocalizer vuforia;
     private TFObjectDetector tfod;
@@ -29,7 +29,7 @@ public class TFODZoneChooser implements ZoneChooser {
     public void init(HardwareMap hardwareMap, Telemetry telemetry) {
         this.hardwareMap = hardwareMap;
         this.telemetry = telemetry;
-        webcam = hardwareMap.get(WebcamName.class, "Webcam");
+        webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
 
         // The TFObjectDetector uses the camera frames
         // from the VuforiaLocalizer, so we create that first.
@@ -50,7 +50,7 @@ public class TFODZoneChooser implements ZoneChooser {
             // (typically 1.78 or 16/9).
 
             // Uncomment the following line if you want to adjust the magnification and/or the aspect ratio of the input images.
-            //tfod.setZoom(2.5, 1.78);
+            tfod.setClippingMargins(400, 100, 0, 100);
         }
     }
 

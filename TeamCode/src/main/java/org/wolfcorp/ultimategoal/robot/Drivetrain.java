@@ -424,14 +424,20 @@ public class Drivetrain extends MecanumDrive {
         }
     }
 
-    public void drive(double x, double y, double rotation, double smX, double smY, double smH, boolean slowModeCondition) {
+    public void drive(double x, double y, double rotation, double slowModeSpeed, boolean slowModeCondition) {
 
         double[] wheelSpeeds = new double[4];
 
-        wheelSpeeds[0] = x * (slowModeCondition ? smX : 1) + y * (slowModeCondition ? smY : 1) + rotation * (slowModeCondition ? smH : 1); // LF
+        /*wheelSpeeds[0] = x * (slowModeCondition ? smX : 1) + y * (slowModeCondition ? smY : 1) + rotation * (slowModeCondition ? smH : 1); // LF
         wheelSpeeds[1] = x * (slowModeCondition ? smX : 1) - y * (slowModeCondition ? smY : 1) - rotation * (slowModeCondition ? smH : 1); // RF
-        wheelSpeeds[2] = x * (slowModeCondition ? smX : 1)- y * (slowModeCondition ? smY : 1) + rotation * (slowModeCondition ? smH : 1); // LB
-        wheelSpeeds[3] = x * (slowModeCondition ? smX : 1) + y * (slowModeCondition ? smY : 1) - rotation * (slowModeCondition ? smH : 1); // RB
+        wheelSpeeds[2] = x * (slowModeCondition ? smX : 1) - y * (slowModeCondition ? smY : 1) + rotation * (slowModeCondition ? smH : 1); // LB
+        wheelSpeeds[3] = x * (slowModeCondition ? smX : 1) + y * (slowModeCondition ? smY : 1) - rotation * (slowModeCondition ? smH : 1); // RB*/
+
+        wheelSpeeds[0] = x + y + rotation;
+        wheelSpeeds[1] = x - y - rotation;
+        wheelSpeeds[2] = x - y + rotation;
+        wheelSpeeds[3] = x + y - rotation;
+
         normalize(wheelSpeeds);
 
         for (int i = 0; i < 4; i++)
@@ -439,7 +445,7 @@ public class Drivetrain extends MecanumDrive {
         normalize(wheelSpeeds);
 
         for (int i = 0; i < 4; i++)
-            wheelSpeeds[i] *= speedMultiplier;
+            wheelSpeeds[i] *= speedMultiplier * (slowModeCondition ? slowModeSpeed : 1);
 
         setMotorPowers(wheelSpeeds[0], wheelSpeeds[2], wheelSpeeds[3], wheelSpeeds[1]);
     }
