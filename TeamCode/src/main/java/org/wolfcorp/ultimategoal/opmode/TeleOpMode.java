@@ -1,6 +1,8 @@
 package org.wolfcorp.ultimategoal.opmode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -11,6 +13,7 @@ import org.wolfcorp.ultimategoal.robot.Scorer;
 public class TeleOpMode extends LinearOpMode {
     @Override
     public void runOpMode() {
+        FtcDashboard dashboard = FtcDashboard.getInstance();
         Drivetrain drive = new Drivetrain(hardwareMap);
         Scorer scorer = new Scorer(hardwareMap);
 
@@ -37,18 +40,21 @@ public class TeleOpMode extends LinearOpMode {
 
             // Outtake
             scorer.toggleStopper(gamepad1.dpad_left, gamepad1.x, 200);
-            scorer.toggleOuttake(gamepad1.y, gamepad1.left_stick_button, 200);
+            scorer.toggleOuttake(gamepad1.y || gamepad2.y, gamepad1.left_stick_button || gamepad2.a, 200);
 
             // Wobble Goal
-            scorer.wobbleGripper(gamepad1.left_bumper, 200);
-            scorer.wobbleArm(gamepad1.dpad_down, gamepad1.dpad_up);
+            scorer.wobbleGripper(gamepad1.left_bumper || gamepad2.left_bumper, 200);
+            scorer.wobbleArm(gamepad1.dpad_down || gamepad2.dpad_down, gamepad1.dpad_up || gamepad2.dpad_up);
 
             // TODO: add driver assist (auto-shoot using odom)
             // TODO: add button for manually resetting encoders after banging against wall
             //  (odometry gets more and more inaccurate over time)
 
-            telemetry.addData("vel", scorer.outtake.getVelocity());
-            telemetry.update();
+            //TelemetryPacket packet = new TelemetryPacket();
+            //packet.put("vel", scorer.outtake.getVelocity());
+            //packet.put("shoot", scorer.stopper.getPosition() < 0.34 ? 2200 : 1500);
+
+            //dashboard.sendTelemetryPacket(packet);
 
             drive.update(); // odometry update
         }

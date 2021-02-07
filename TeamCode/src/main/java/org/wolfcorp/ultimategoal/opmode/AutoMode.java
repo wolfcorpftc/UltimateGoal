@@ -52,7 +52,7 @@ public class AutoMode extends LinearOpMode {
             case A:
             case UNSET:
                 targetZoneA = new Pose2d(12, 56, Math.toRadians(0));
-                targetZoneB = new Pose2d(10, 51, Math.toRadians(0));
+                targetZoneB = new Pose2d(14, 51, Math.toRadians(0));
                 break;
             case B:
                 targetZoneA = new Pose2d(36, 26, Math.toRadians(0));
@@ -76,7 +76,7 @@ public class AutoMode extends LinearOpMode {
         // Move and shoot
         Trajectory traj1 = drive
                 .from(initialPose)
-                .lineToLinearHeading(new Pose2d(-14, 54, Math.toRadians(-6.5)))
+                .lineToLinearHeading(new Pose2d(-14, 54, Math.toRadians(-8)))
                 .build();
 
         // Shoot -> drop wobble goal
@@ -87,7 +87,7 @@ public class AutoMode extends LinearOpMode {
 
         // Drop -> pick up rings
         Trajectory traj3 = drive.from(traj2.end())
-                .lineToLinearHeading(new Pose2d(traj2.end().getX(), 36, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(traj2.end().getX(), 34, Math.toRadians(0)))
                 .build();
 
         Trajectory traj3a = drive.from(traj3.end())
@@ -104,13 +104,13 @@ public class AutoMode extends LinearOpMode {
 
         // Path to near wobble goal
         Trajectory traj4 = drive.from(new Pose2d(traj3b.end().getX(), traj3b.end().getY(), Math.toRadians(180)))
-                .lineToLinearHeading(new Pose2d(-48.5, 44, Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(-48, 44, Math.toRadians(180)))
                 .build();
 
         // Path to wobble goal
         Trajectory traj5 = drive.from(traj4.end())
                 .lineToLinearHeading(
-                        new Pose2d(-48.5, 35.5, Math.toRadians(180))
+                        new Pose2d(-50, 34, Math.toRadians(180))
                 )
                 .build();
 
@@ -130,12 +130,12 @@ public class AutoMode extends LinearOpMode {
         // Move and shoot (high goal)
         scorer.outtakeOn();
         drive.follow(traj1);
-        sleep(1000);
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 3; i++) {
             sleep(300);
-            scorer.stopperOpen();
-            sleep(200);
             scorer.stopperClose();
+            sleep(200);
+            scorer.stopperOpen();
+            scorer.outtakeOn();
         }
         scorer.outtakeOff();
 
@@ -150,9 +150,9 @@ public class AutoMode extends LinearOpMode {
         drive.follow(traj3);
         drive.follow(traj3a);
         drive.follow(traj3b);
-        drive.turn(Math.toRadians(3));
         scorer.outtakeOn();
-        sleep(1000);
+        drive.turn(Math.toRadians(4));
+        sleep(1500);
         for (int i = 0; i < 4; i++) {
             sleep(300);
             scorer.stopperOpen();
@@ -174,7 +174,7 @@ public class AutoMode extends LinearOpMode {
         //drive.follow(traj3e);
 
         // Drive near wobble goal
-        drive.turn(Math.toRadians(177));
+        drive.turn(Math.toRadians(176));
         drive.updatePoseEstimate();
         drive.follow(traj4);
 

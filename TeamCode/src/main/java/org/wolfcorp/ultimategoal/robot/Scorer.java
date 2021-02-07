@@ -1,5 +1,6 @@
 package org.wolfcorp.ultimategoal.robot;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -9,15 +10,22 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import static java.lang.Thread.sleep;
 
+@Config
 public class Scorer {
     public DcMotorEx intake, outtake, arm;
     public Servo gripper, stopper, release;
 
     public boolean reverse = false;
+    public int fireAmount = 0;
+
+    public static PIDFCoefficients outtakeCoeff = new PIDFCoefficients(35, 0.16, 0, 16);
+
+    private boolean xclick = true;
 
     private ElapsedTime intakeDelay = new ElapsedTime();
     private ElapsedTime outtakeDelay = new ElapsedTime();
     private ElapsedTime stopperDelay = new ElapsedTime();
+    private ElapsedTime fireDelay = new ElapsedTime();
     private ElapsedTime gripperDelay = new ElapsedTime();
     private ElapsedTime reverseDelay = new ElapsedTime();
 
@@ -25,6 +33,7 @@ public class Scorer {
         intake = hardwareMap.get(DcMotorEx.class, "intake");
         outtake = hardwareMap.get(DcMotorEx.class, "outtake");
         outtake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        outtake.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, outtakeCoeff);
         arm = hardwareMap.get(DcMotorEx.class, "arm");
         arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
@@ -52,15 +61,22 @@ public class Scorer {
     }
 
     public void toggleStopper(boolean manualCondition, boolean automaticCondition, int toggleDelay) {
-        if ((manualCondition || automaticCondition) && stopperDelay.milliseconds() > toggleDelay) {
-            int amount = manualCondition ? 1 : 3;
-            for (int i = 0; i < amount; i++) {
-                stopper.setPosition(0.02);
-                pause(200);
+        if ((manualCondition || (automaticCondition && xclick)) && stopperDelay.milliseconds() > toggleDelay) {
+            xclick = false;
+            fireAmount = manualCondition ? 1 : 3;
+            fireDelay.reset();
+        }
+        if(!automaticCondition)
+            xclick = true;
+        if (fireAmount > 0) {
+            if (fireDelay.milliseconds() > 400) {
+                fireDelay.reset();
+                fireAmount--;
+            } else if (fireDelay.milliseconds() > 200) {
                 stopper.setPosition(0.34);
-                pause(200);
+            } else {
+                stopper.setPosition(0.02);
             }
-            stopperDelay.reset();
         }
     }
 
@@ -125,7 +141,7 @@ public class Scorer {
     }
 
     public void outtakeOn() {
-        outtake.setVelocity(1750);
+        outtake.setVelocity(1700);
     }
 
     public void outtakeOn(int speed) {
