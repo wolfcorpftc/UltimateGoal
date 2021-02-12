@@ -26,14 +26,8 @@ public class OpenCVZoneChooser extends OpenCvPipeline implements ZoneChooser {
     protected Target target = Target.UNSET;
 
     public OpenCVZoneChooser() {
-        // TODO: tune the rectangles
-//        switch (sp) {
-//            case BL: ROI = new Rect(new Point(60, 35), new Point(120, 75)); break;
-//            case BR: ROI = new Rect(new Point(60, 35), new Point(120, 75)); break;
-//            case RL: ROI = new Rect(new Point(60, 35), new Point(120, 75)); break;
-//            case RR: ROI = new Rect(new Point(60, 35), new Point(120, 75)); break;
-//        }
-        ROI = new Rect(new Point(60, 35), new Point(120, 75));
+        // TODO: shrink the rectangle
+        ROI = new Rect(new Point(64, 48), new Point(256, 192));
     }
 
     public Mat processFrame(Mat input) {
