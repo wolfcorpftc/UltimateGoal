@@ -37,9 +37,9 @@ public class OpenCVZoneChooser extends OpenCvPipeline implements ZoneChooser {
     }
 
     public Mat processFrame(Mat input) {
-
-        Imgproc.cvtColor(input, mat, Imgproc.COLOR_YUV2RGB);
+        Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGBA2RGB);
         Imgproc.cvtColor(mat, mat, Imgproc.COLOR_RGB2HSV);
+
         // Note that OpenCV HSV hue ranges from [0, 179], not [0, 359]
         // TODO: tune color
         Scalar lowHSV = new Scalar(30 / 2.0, 150, 153);
@@ -67,12 +67,13 @@ public class OpenCVZoneChooser extends OpenCvPipeline implements ZoneChooser {
             target = Target.A;
             resultColor = new Scalar(0, 0, 255);
         }
+
         //Imgproc.cvtColor(input, input, Imgproc.COLOR_HSV2RGB);
         Imgproc.rectangle(input, ROI, resultColor);
         telemetry.addData("Target Zone", target.name());
         telemetry.update();
 
-        return mat;
+        return input;
     }
 
     public void init(HardwareMap hardwareMap, Telemetry telemetry) {
