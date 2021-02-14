@@ -28,8 +28,7 @@ public class BrightOpenCVZoneChooser extends OpenCvPipeline implements ZoneChoos
     protected Target target = Target.UNSET;
 
     public BrightOpenCVZoneChooser() {
-        // TODO: shrink the rectangle
-        ringROI = new Rect(new Point(213, 120), new Point(267, 160));
+        ringROI = new Rect(new Point(275, 120), new Point(329, 160));
     }
 
 
