@@ -1,6 +1,5 @@
 package org.wolfcorp.ultimategoal.vision;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -14,46 +13,50 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvInternalCamera;
 import org.openftc.easyopencv.OpenCvPipeline;
-@Disabled
-public class OpenCVZoneChooser extends OpenCvPipeline implements ZoneChooser {
+
+public class DimOpenCVZoneChooser extends OpenCvPipeline {
+
+    public static final double ZONE_C_THRESH = 80.0;
+    public static final double ZONE_B_THRESH = 15.0;
 
     protected OpenCvCamera cam;
     protected Telemetry telemetry;
-    protected Rect ROI;
+    protected Rect ringROI;
+    protected Rect fieldROI;
     protected Mat mat = new Mat();
+    protected Mat ring = new Mat();
+    protected Mat field = new Mat();
     protected Target target = Target.UNSET;
 
-    public OpenCVZoneChooser() {
+    public DimOpenCVZoneChooser() {
         // TODO: shrink the rectangle
-        ROI = new Rect(new Point(64, 48), new Point(256, 192));
+        ringROI = new Rect(new Point(213, 120), new Point(267, 160));
+        fieldROI = new Rect(new Point(80, 180), new Point(240, 240));
     }
+
 
     public Mat processFrame(Mat input) {
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGBA2RGB);
         Imgproc.cvtColor(mat, mat, Imgproc.COLOR_RGB2HSV);
 
-        // Note that OpenCV HSV hue ranges from [0, 179], not [0, 359]
-        // TODO: tune color
-        Scalar lowHSV = new Scalar(30 / 2.0, 150, 153);
-        Scalar highHSV = new Scalar(44 / 2.0, 255, 255);
+        Mat ring = mat.submat(ringROI);
+        Mat field = mat.submat(fieldROI);
+        double[] a = avgColor(ring);
+        double[] b = avgColor(field);
 
-        Core.inRange(mat, lowHSV, highHSV, mat);
-        Mat ringArea = mat.submat(ROI);
-        double percentage = Math.round(Core.sumElems(ringArea).val[0] / ROI.area() / 255 * 100);
-        ringArea.release();
-
-        telemetry.addData("Raw value", (int) Core.sumElems(ringArea).val[0]);
-        telemetry.addData("Percentage", Math.round(percentage * 100) + "%");
+        double diff = 0;
+        for (int i = 0; i < a.length; i++)
+            diff += Math.abs(a[i] - b[i]);
+        telemetry.addData("Difference", diff);
 
         // TODO: tune percentage thresholds
         Scalar resultColor;
-        if (percentage > 80) {
+        if (diff > ZONE_C_THRESH) {
             target = Target.C;
             resultColor = new Scalar(255, 0, 0);
         }
-        else if (percentage > 15) {
+        else if (diff > ZONE_B_THRESH) {
             target = Target.B;
             resultColor = new Scalar(0, 255, 0);
         }
@@ -62,12 +65,20 @@ public class OpenCVZoneChooser extends OpenCvPipeline implements ZoneChooser {
             resultColor = new Scalar(0, 0, 255);
         }
 
-        //Imgproc.cvtColor(input, input, Imgproc.COLOR_HSV2RGB);
-        Imgproc.rectangle(input, ROI, resultColor);
+        Imgproc.rectangle(input, ringROI, resultColor);
+        Imgproc.rectangle(input, fieldROI, new Scalar(0, 0, 0));
         telemetry.addData("Target Zone", target.name());
         telemetry.update();
 
         return input;
+    }
+
+    double[] avgColor(Mat mat) {
+        Scalar sum = Core.sumElems(mat);
+        for (int i = 0; i < sum.val.length; i++) {
+            sum.val[i] /= mat.rows() * mat.cols();
+        }
+        return sum.val.clone();
     }
 
     public void init(HardwareMap hardwareMap, Telemetry telemetry) {
