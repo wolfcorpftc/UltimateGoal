@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.wolfcorp.ultimategoal.robot.Drivetrain;
 import org.wolfcorp.ultimategoal.vision.BrightOpenCVZoneChooser;
+import org.wolfcorp.ultimategoal.vision.DimOpenCVZoneChooser;
 import org.wolfcorp.ultimategoal.vision.ZoneChooser;
 
 // TODO: add actual autonomous opmodes
@@ -16,7 +17,7 @@ public class VisionTesting extends LinearOpMode {
     public void runOpMode() {
         Drivetrain drive = new Drivetrain(hardwareMap);
         // To change the vision algorithm, change the constructor used
-        chooser = new BrightOpenCVZoneChooser();
+        chooser = new DimOpenCVZoneChooser();
         chooser.init(hardwareMap, telemetry);
 
         waitForStart();

@@ -31,7 +31,9 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.wolfcorp.ultimategoal.util.AxesSigns;
 import org.wolfcorp.ultimategoal.util.BNO055IMUUtil;
 import org.wolfcorp.ultimategoal.util.DashboardUtil;
@@ -101,7 +103,7 @@ public class Drivetrain extends MecanumDrive {
 
     public DcMotorEx leftFront, leftBack, rightBack, rightFront;
     private List<DcMotorEx> motors;
-    private BNO055IMU imu;
+    public BNO055IMU imu;
 
     private VoltageSensor batteryVoltageSensor;
 
@@ -441,12 +443,60 @@ public class Drivetrain extends MecanumDrive {
         normalize(wheelSpeeds);
 
         for (int i = 0; i < 4; i++)
-            wheelSpeeds[i] = Math.pow(wheelSpeeds[i],3);
+            wheelSpeeds[i] = Math.pow(wheelSpeeds[i],5);
         normalize(wheelSpeeds);
 
         for (int i = 0; i < 4; i++)
             wheelSpeeds[i] *= speedMultiplier * (slowModeCondition ? slowModeSpeed : 1);
 
         setMotorPowers(wheelSpeeds[0], wheelSpeeds[2], wheelSpeeds[3], wheelSpeeds[1]);
+    }
+
+    public void resetAngle(){
+        double angle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+        System.out.println(angle);
+        if(Math.abs(angle)<0.5){
+            setMotorPowers(0, 0, 0, 0);
+            return;
+        }
+        if(angle<0){
+            angle=Math.max(0.1,Math.min(1,Math.abs(angle)/50));
+            setMotorPowers(-angle, -angle, angle, angle);
+        }
+        else{
+            angle=Math.max(0.1,Math.min(1,Math.abs(angle)/50));
+            setMotorPowers(angle, angle, -angle, -angle);
+        }
+    }
+    public void turnTo(double degree){
+        double angle = degree + imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+        System.out.println(angle);
+        if(Math.abs(angle)<0.5){
+            setMotorPowers(0, 0, 0, 0);
+            return;
+        }
+        if(angle<0){
+            angle=Math.max(0.1,Math.min(1,Math.abs(angle)/50));
+            setMotorPowers(-angle, -angle, angle, angle);
+        }
+        else{
+            angle=Math.max(0.1,Math.min(1,Math.abs(angle)/50));
+            setMotorPowers(angle, angle, -angle, -angle);
+        }
+    }
+
+    public void turnForward(boolean condition) {
+        double angle = Math.toRadians(-imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
+        if (condition) turn(angle);
+        System.out.println(angle);
+    }
+
+    public double[] trueAimBot(){
+        Pose2d position = getPoseEstimate();
+        double x = 72-position.getX();
+        double y = 36-position.getY();
+        double distance = Math.sqrt(x*x+y*y);
+        double degree = Math.toDegrees(Math.atan(-y/x));
+        return (new double[]{distance,degree});
     }
 }

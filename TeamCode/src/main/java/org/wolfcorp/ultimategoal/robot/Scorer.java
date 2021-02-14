@@ -54,7 +54,7 @@ public class Scorer {
     //TODO: 0-> 1800 -> 1600
     public void toggleOuttake(boolean condition, boolean lowerMode, int toggleDelay) {
         if ((condition || lowerMode) && outtakeDelay.milliseconds() > toggleDelay) {
-            outtake.setVelocity(outtake.getVelocity() == 0 ? ((lowerMode ? 0.8 : 1) * 1700) : 0);
+            outtake.setVelocity(outtake.getVelocity() == 0 ? ((lowerMode ? 0.8 : 1) * 1150) : 0);
             stopper.setPosition(0.34);
             outtakeDelay.reset();
         }
@@ -69,13 +69,13 @@ public class Scorer {
         if(!automaticCondition)
             xclick = true;
         if (fireAmount > 0) {
-            if (fireDelay.milliseconds() > 400) {
+            if (fireDelay.milliseconds() > 500) {
                 fireDelay.reset();
                 fireAmount--;
-            } else if (fireDelay.milliseconds() > 200) {
-                stopper.setPosition(0.34);
+            } else if (fireDelay.milliseconds() > 250) {
+                stopperClose();
             } else {
-                stopper.setPosition(0.02);
+                stopperOpen();
             }
         }
     }
@@ -136,16 +136,20 @@ public class Scorer {
         intake.setPower(-1);
     }
 
+    public void intakeSlow() {
+        intake.setPower(-1);
+    }
+
     public void intakeOff() {
         intake.setPower(0);
     }
 
     public void outtakeOn() {
-        outtake.setVelocity(1700);
+        outtake.setVelocity(1100);
     }
 
-    public void outtakeOn(int speed) {
-        outtake.setVelocity(speed);
+    public void outtakeOn(int difference) {
+        outtake.setVelocity(1100+difference);
     }
 
     public void outtakeOff() {
