@@ -30,9 +30,8 @@ public class DimOpenCVZoneChooser extends OpenCvPipeline {
     protected Target target = Target.UNSET;
 
     public DimOpenCVZoneChooser() {
-        // TODO: shrink the rectangle
         ringROI = new Rect(new Point(275, 120), new Point(329, 160));
-        fieldROI = new Rect(new Point(80, 180), new Point(240, 240));
+        fieldROI = new Rect(new Point(80, 210), new Point(240, 240));
     }
 
 
