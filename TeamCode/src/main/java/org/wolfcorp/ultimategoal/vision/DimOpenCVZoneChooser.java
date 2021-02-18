@@ -15,7 +15,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-public class DimOpenCVZoneChooser extends OpenCvPipeline {
+public class DimOpenCVZoneChooser extends OpenCvPipeline implements ZoneChooser {
 
     public static final double ZONE_C_THRESH = 80.0;
     public static final double ZONE_B_THRESH = 15.0;
