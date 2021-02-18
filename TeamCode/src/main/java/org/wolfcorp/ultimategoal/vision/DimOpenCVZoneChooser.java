@@ -15,7 +15,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-public class DimOpenCVZoneChooser extends OpenCvPipeline implements ZoneChooser {
+public class DimOpenCVZoneChooser extends OpenCvPipeline {
 
     public static final double ZONE_C_THRESH = 80.0;
     public static final double ZONE_B_THRESH = 15.0;
@@ -30,25 +30,19 @@ public class DimOpenCVZoneChooser extends OpenCvPipeline implements ZoneChooser 
     protected Target target = Target.UNSET;
 
     public DimOpenCVZoneChooser() {
-        // TODO: shrink the rectangle
-        ringROI = new Rect(new Point(213, 170), new Point(267, 210));
-        fieldROI = new Rect(new Point(80, 140), new Point(239, 220));
+        ringROI = new Rect(new Point(275, 120), new Point(329, 160));
+        fieldROI = new Rect(new Point(80, 210), new Point(240, 240));
     }
 
 
     public Mat processFrame(Mat input) {
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGBA2RGB);
         Imgproc.cvtColor(mat, mat, Imgproc.COLOR_RGB2HSV);
-        telemetry.addData("cols", mat.cols());
-        telemetry.addData("rows", mat.rows());
-        telemetry.update();
+
         Mat ring = mat.submat(ringROI);
         Mat field = mat.submat(fieldROI);
         double[] a = avgColor(ring);
         double[] b = avgColor(field);
-        telemetry.addData("cols new", mat.cols());
-        telemetry.addData("rows new", mat.rows());
-        telemetry.update();
 
         double diff = 0;
         for (int i = 0; i < a.length; i++)

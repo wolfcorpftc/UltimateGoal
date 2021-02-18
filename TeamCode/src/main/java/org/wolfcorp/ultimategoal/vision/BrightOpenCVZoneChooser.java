@@ -37,16 +37,21 @@ public class BrightOpenCVZoneChooser extends OpenCvPipeline implements ZoneChoos
         Imgproc.cvtColor(mat, mat, Imgproc.COLOR_RGB2HSV);
 
         // Note that OpenCV HSV hue ranges from [0, 179], not [0, 359]
+        // Hue: [0, 179]
+        // Sat: [0, 255]
+        // Val: [0, 255]
         // TODO: tune color
-        Scalar lowHSV = new Scalar(30 / 2.0, 150, 153);
-        Scalar highHSV = new Scalar(44 / 2.0, 255, 255);
+        Scalar lowHSV = new Scalar(15 / 2.0, 100, 125);
+        Scalar highHSV = new Scalar(45 / 2.0, 255, 255);
 
         Core.inRange(mat, lowHSV, highHSV, mat);
 
         ring = mat.submat(ringROI);
-        double percentage = Math.round(Core.sumElems(ring).val[0] / ringROI.area() / 255 * 100);
-        telemetry.addData("Raw value", (int) Core.sumElems(ring).val[0]);
+        double rawValue = Core.sumElems(ring).val[0];
+        double percentage = Math.round(rawValue / ringROI.area() / 255 * 100);
+        telemetry.addData("Raw value", (int) rawValue);
         telemetry.addData("Percentage", Math.round(percentage * 100) + "%");
+        telemetry.addData("Threshold", Math.round(percentage * 100) + "%");
 
         // TODO: tune percentage thresholds
         Scalar resultColor;
