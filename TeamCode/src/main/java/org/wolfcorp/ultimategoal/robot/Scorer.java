@@ -18,11 +18,12 @@ public class Scorer {
     public boolean reverse = false;
     public int fireAmount = 0;
 
-    public static PIDFCoefficients outtakeCoeff = new PIDFCoefficients(35, 0.16, 0, 16);
+    public static PIDFCoefficients outtakeCoeff = new PIDFCoefficients(45, 0.16, 0, 16);
 
     private boolean xclick = true;
 
     private ElapsedTime intakeDelay = new ElapsedTime();
+    private ElapsedTime flipperDelay = new ElapsedTime();
     private ElapsedTime outtakeDelay = new ElapsedTime();
     private ElapsedTime stopperDelay = new ElapsedTime();
     private ElapsedTime fireDelay = new ElapsedTime();
@@ -51,17 +52,23 @@ public class Scorer {
         }
     }
 
-    //TODO: 0-> 1800 -> 1600
+    public void toggleIntakeFlipper(boolean condition) {
+        if (condition && flipperDelay.milliseconds() > 200) {
+            release.setPosition(release.getPosition() == 0.5 ? 0 : 0.5);
+            flipperDelay.reset();
+        }
+    }
+
     public void toggleOuttake(boolean condition, boolean lowerMode, int toggleDelay) {
         if ((condition || lowerMode) && outtakeDelay.milliseconds() > toggleDelay) {
-            outtake.setVelocity(outtake.getVelocity() == 0 ? ((lowerMode ? 0.8 : 1) * 1150) : 0);
-            stopper.setPosition(0.34);
+            outtake.setVelocity(outtake.getVelocity() == 0 ? ((lowerMode ? 0.65 : 1) * 2000) : 0);
+            stopperClose();
             outtakeDelay.reset();
         }
     }
 
     public void toggleStopper(boolean manualCondition, boolean automaticCondition, int toggleDelay) {
-        if ((manualCondition || (automaticCondition && xclick)) && stopperDelay.milliseconds() > toggleDelay) {
+        if ((manualCondition || automaticCondition) && xclick && stopperDelay.milliseconds() > toggleDelay) {
             xclick = false;
             fireAmount = manualCondition ? 1 : 3;
             fireDelay.reset();
@@ -69,10 +76,10 @@ public class Scorer {
         if(!automaticCondition)
             xclick = true;
         if (fireAmount > 0) {
-            if (fireDelay.milliseconds() > 500) {
+            if (fireDelay.milliseconds() > 680) {
                 fireDelay.reset();
                 fireAmount--;
-            } else if (fireDelay.milliseconds() > 250) {
+            } else if (fireDelay.milliseconds() > 340) {
                 stopperClose();
             } else {
                 stopperOpen();
@@ -82,7 +89,7 @@ public class Scorer {
 
     public void wobbleGripper(boolean condition, int toggleDelay) {
         if (condition && gripperDelay.milliseconds() > toggleDelay) {
-            gripper.setPosition(gripper.getPosition() == 0.42 ? 0.8 : 0.42);
+            gripper.setPosition(gripper.getPosition() == 0.3 ? 1 : 0.3);
             gripperDelay.reset();
         }
     }
@@ -105,12 +112,12 @@ public class Scorer {
     }
 
     public void gripperOpen(){
-        gripper.setPosition(0.8);
+        gripper.setPosition(1);
         pause(400);
     }
 
     public void gripperClose(){
-        gripper.setPosition(0.42);
+        gripper.setPosition(0.3);
         pause(600);
     }
 
@@ -137,7 +144,7 @@ public class Scorer {
     }
 
     public void intakeSlow() {
-        intake.setPower(-1);
+        intake.setPower(-0.8);
     }
 
     public void intakeOff() {
@@ -145,11 +152,11 @@ public class Scorer {
     }
 
     public void outtakeOn() {
-        outtake.setVelocity(1100);
+        outtake.setVelocity(1500);
     }
 
     public void outtakeOn(int difference) {
-        outtake.setVelocity(1100+difference);
+        outtake.setVelocity(1500+difference);
     }
 
     public void outtakeOff() {

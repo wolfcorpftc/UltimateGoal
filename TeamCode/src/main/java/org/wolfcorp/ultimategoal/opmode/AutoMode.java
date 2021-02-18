@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.wolfcorp.ultimategoal.robot.DriveConstants;
 import org.wolfcorp.ultimategoal.robot.Drivetrain;
 import org.wolfcorp.ultimategoal.robot.Scorer;
+import org.wolfcorp.ultimategoal.vision.BrightOpenCVZoneChooser;
 import org.wolfcorp.ultimategoal.vision.TFODZoneChooser;
 import org.wolfcorp.ultimategoal.vision.Target;
 import org.wolfcorp.ultimategoal.vision.ZoneChooser;
@@ -37,7 +38,7 @@ public class AutoMode extends LinearOpMode {
         // Rotation of 0 is straight up, uses radians
         // Start -> shooting position
 
-        chooser = new TFODZoneChooser();
+        chooser = new BrightOpenCVZoneChooser();
         chooser.init(hardwareMap, telemetry);
         Pose2d targetZoneA;
         Pose2d targetZoneB;
@@ -53,14 +54,14 @@ public class AutoMode extends LinearOpMode {
                 targetZoneB = new Pose2d(14, 51, Math.toRadians(0));
                 break;
             case B:
-                targetZoneA = new Pose2d(30, 36, Math.toRadians(-90));
-                targetZoneB = new Pose2d(24, 36, Math.toRadians(-90));
+                targetZoneA = new Pose2d(22, 34, Math.toRadians(-90));
+                targetZoneB = new Pose2d(22, 36, Math.toRadians(-90));
                 break;
             default:
             case UNSET:
             case C:
-                targetZoneA = new Pose2d(54, 54, Math.toRadians(0));
-                targetZoneB = new Pose2d(66, 46, Math.toRadians(0));
+                targetZoneA = new Pose2d(54, 54, Math.toRadians(-45));
+                targetZoneB = new Pose2d(66, 46, Math.toRadians(-45));
                 break;
         }
 
@@ -87,14 +88,14 @@ public class AutoMode extends LinearOpMode {
 
         // Drop -> pick up rings
         Trajectory traj3 = drive.from(traj2.end())
-                .lineToLinearHeading(new Pose2d(traj2.end().getX(), 36, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(traj2.end().getX(), 39, Math.toRadians(0)))
                 .build();
 
         Trajectory traj3a = drive.from(traj3.end())
                 .lineToLinearHeading(new Pose2d(-7, traj3.end().getY(), Math.toRadians(0)))
                 .build();
 
-        Trajectory traj3b = drive.from(traj3a.end()).back(13).build();
+        Trajectory traj3b = drive.from(traj3a.end()).back(19).build();
 /*
         Trajectory traj3c = drive.from(traj3b.end()).forward(12).build();
 
@@ -104,13 +105,13 @@ public class AutoMode extends LinearOpMode {
 
         // Path to near wobble goal
         Trajectory traj4 = drive.from(new Pose2d(traj3b.end().getX(), traj3b.end().getY(), Math.toRadians(180)))
-                .lineToLinearHeading(new Pose2d(-48, 44, Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(-47, 44, Math.toRadians(180)))
                 .build();
 
         // Path to wobble goal
         Trajectory traj5 = drive.from(traj4.end())
                 .lineToLinearHeading(
-                        new Pose2d(-48, 36, Math.toRadians(180))
+                        new Pose2d(-47, 36, Math.toRadians(180))
                 )
                 .build();
 
@@ -136,7 +137,6 @@ public class AutoMode extends LinearOpMode {
             sleep(200);
             scorer.stopperOpen();
         }
-        sleep(300);
         scorer.outtakeOff();
 
         // Drop the wobble goal (in Zone C for now)
@@ -148,10 +148,10 @@ public class AutoMode extends LinearOpMode {
         // Go back to pick up the rings
         scorer.intakeSlow();
         drive.follow(traj3);
+        scorer.outtakeOn(-50);
         drive.follow(traj3a);
         drive.follow(traj3b);
-        scorer.outtakeOn();
-        sleep(1500);
+        sleep(300);
         for (int i = 0; i < 4; i++) {
             sleep(300);
             scorer.stopperOpen();

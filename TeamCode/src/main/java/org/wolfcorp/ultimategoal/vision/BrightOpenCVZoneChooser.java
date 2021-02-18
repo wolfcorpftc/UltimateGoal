@@ -17,8 +17,8 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 public class BrightOpenCVZoneChooser extends OpenCvPipeline implements ZoneChooser {
 
-    public static final double ZONE_C_THRESH = 80.0;
-    public static final double ZONE_B_THRESH = 15.0;
+    public static final double ZONE_C_THRESH = 17.0;
+    public static final double ZONE_B_THRESH = 8.0;
 
     protected OpenCvCamera cam;
     protected Telemetry telemetry;
@@ -28,7 +28,7 @@ public class BrightOpenCVZoneChooser extends OpenCvPipeline implements ZoneChoos
     protected Target target = Target.UNSET;
 
     public BrightOpenCVZoneChooser() {
-        ringROI = new Rect(new Point(275, 120), new Point(329, 160));
+        ringROI = new Rect(new Point(223, 120), new Point(287, 170));
     }
 
 
@@ -41,17 +41,16 @@ public class BrightOpenCVZoneChooser extends OpenCvPipeline implements ZoneChoos
         // Sat: [0, 255]
         // Val: [0, 255]
         // TODO: tune color
-        Scalar lowHSV = new Scalar(15 / 2.0, 100, 125);
+        Scalar lowHSV = new Scalar(15 / 2.0, 100, 100);
         Scalar highHSV = new Scalar(45 / 2.0, 255, 255);
 
         Core.inRange(mat, lowHSV, highHSV, mat);
 
         ring = mat.submat(ringROI);
-        double rawValue = Core.sumElems(ring).val[0];
-        double percentage = Math.round(rawValue / ringROI.area() / 255 * 100);
-        telemetry.addData("Raw value", (int) rawValue);
-        telemetry.addData("Percentage", Math.round(percentage * 100) + "%");
-        telemetry.addData("Threshold", Math.round(percentage * 100) + "%");
+        double percentage = Math.round(Core.sumElems(ring).val[0] / ringROI.area() / 255 * 100);
+        telemetry.addData("Percentage", percentage + "%");
+        telemetry.addData("B Threshold", ZONE_B_THRESH + "%");
+        telemetry.addData("C Threshold", ZONE_C_THRESH + "%");
 
         // TODO: tune percentage thresholds
         Scalar resultColor;
@@ -68,11 +67,11 @@ public class BrightOpenCVZoneChooser extends OpenCvPipeline implements ZoneChoos
             resultColor = new Scalar(0, 0, 255);
         }
 
-        Imgproc.rectangle(input, ringROI, resultColor);
+        Imgproc.rectangle(mat, ringROI, resultColor);
         telemetry.addData("Target Zone", target.name());
         telemetry.update();
 
-        return input;
+        return mat;
     }
 
     public void init(HardwareMap hardwareMap, Telemetry telemetry) {

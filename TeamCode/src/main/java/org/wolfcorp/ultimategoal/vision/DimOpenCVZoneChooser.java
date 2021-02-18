@@ -30,7 +30,7 @@ public class DimOpenCVZoneChooser extends OpenCvPipeline implements ZoneChooser 
     protected Target target = Target.UNSET;
 
     public DimOpenCVZoneChooser() {
-        ringROI = new Rect(new Point(275, 120), new Point(329, 160));
+        ringROI = new Rect(new Point(213, 175), new Point(267, 215));
         fieldROI = new Rect(new Point(80, 210), new Point(240, 240));
     }
 

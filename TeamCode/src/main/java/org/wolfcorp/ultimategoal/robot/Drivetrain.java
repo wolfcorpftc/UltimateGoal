@@ -442,8 +442,14 @@ public class Drivetrain extends MecanumDrive {
 
         normalize(wheelSpeeds);
 
-        for (int i = 0; i < 4; i++)
-            wheelSpeeds[i] = Math.pow(wheelSpeeds[i],5);
+        for (int i = 0; i < 4; i++) {
+            if (wheelSpeeds[i] > -0.25 && wheelSpeeds[i] < 0) {
+                wheelSpeeds[i] = -0.25;
+            } else if (wheelSpeeds[i] < 0.25 && wheelSpeeds[i] > 0) {
+                wheelSpeeds[i] = 0.25;
+            }
+            wheelSpeeds[i] = Math.pow(wheelSpeeds[i], 3);
+        }
         normalize(wheelSpeeds);
 
         for (int i = 0; i < 4; i++)

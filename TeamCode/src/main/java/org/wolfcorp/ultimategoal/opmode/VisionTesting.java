@@ -17,7 +17,7 @@ public class VisionTesting extends LinearOpMode {
     public void runOpMode() {
         Drivetrain drive = new Drivetrain(hardwareMap);
         // To change the vision algorithm, change the constructor used
-        chooser = new DimOpenCVZoneChooser();
+        chooser = new BrightOpenCVZoneChooser();
         chooser.init(hardwareMap, telemetry);
 
         waitForStart();

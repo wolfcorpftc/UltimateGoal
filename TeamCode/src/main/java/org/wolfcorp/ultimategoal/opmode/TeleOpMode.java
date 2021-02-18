@@ -41,9 +41,9 @@ public class TeleOpMode extends LinearOpMode {
             drive.drive(-gamepad1.right_stick_y,
                     gamepad1.right_stick_x,
                     gamepad1.left_stick_x, 0.4, gamepad1.right_bumper);
-
+/*
             if(gamepad1.right_trigger > 0.8) {
-                double[] arr = drive.trueAimBot();
+                *//*double[] arr = drive.trueAimBot();
                 double distance = arr[0];
                 double degree = arr[1];
                 packet.put("distance", distance);
@@ -52,13 +52,17 @@ public class TeleOpMode extends LinearOpMode {
                 while (gamepad1.right_trigger > 0.8) {
                     //drive.resetAngle();
                     drive.turnTo(degree);
-                }
-            }
+                }*//*
+
+            }*/
+            drive.turnForward(gamepad1.right_trigger > 0.8);
+
             // Reversing scoring mechanisms
             scorer.reverse(gamepad1.b, 200);
 
             // Intake
             scorer.toggleIntake(gamepad1.a && !gamepad1.start, 1, 200);
+            scorer.toggleIntakeFlipper(gamepad1.dpad_right || gamepad2.right_bumper);
 
             // Outtake
             scorer.toggleStopper(gamepad1.dpad_left, gamepad1.x, 200);
@@ -72,11 +76,12 @@ public class TeleOpMode extends LinearOpMode {
             // TODO: add button for manually resetting encoders after banging against wall
             //  (odometry gets more and more inaccurate over time)
 
-/*            packet.put("vel", scorer.outtake.getVelocity());
+            packet.put("vel", scorer.outtake.getVelocity());
             packet.put("shoot", scorer.stopper.getPosition() < 0.34 ? 2200 : 1500);
             packet.put("robot speed", drive.rightFront.getPower());
-            packet.put("heading", drive.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);*/
+            packet.put("heading", drive.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
 
+            dashboard.sendTelemetryPacket(packet);
             drive.update(); // odometry update
         }
     }
