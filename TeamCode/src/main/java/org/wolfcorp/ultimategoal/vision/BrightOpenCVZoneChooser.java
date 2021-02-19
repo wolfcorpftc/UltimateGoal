@@ -17,18 +17,20 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 public class BrightOpenCVZoneChooser extends OpenCvPipeline implements ZoneChooser {
 
-    public static final double ZONE_C_THRESH = 17.0;
-    public static final double ZONE_B_THRESH = 8.0;
+    public static final double THRESH = 8.0;
 
     protected OpenCvCamera cam;
     protected Telemetry telemetry;
-    protected Rect ringROI;
+    protected Rect topROI, bottomROI, ringROI;
     protected Mat mat = new Mat();
-    protected Mat ring = new Mat();
+    protected Mat top = new Mat();
+    protected Mat bottom = new Mat();
     protected Target target = Target.UNSET;
 
     public BrightOpenCVZoneChooser() {
-        ringROI = new Rect(new Point(223, 120), new Point(287, 170));
+        topROI = new Rect(new Point(223, 120), new Point(287, 145));
+        bottomROI = new Rect(new Point(223, 145), new Point(287, 170));
+        ringROI = new Rect(new Point(213, 175), new Point(267, 215));
     }
 
 
@@ -46,28 +48,31 @@ public class BrightOpenCVZoneChooser extends OpenCvPipeline implements ZoneChoos
 
         Core.inRange(mat, lowHSV, highHSV, mat);
 
-        ring = mat.submat(ringROI);
-        double percentage = Math.round(Core.sumElems(ring).val[0] / ringROI.area() / 255 * 100);
-        telemetry.addData("Percentage", percentage + "%");
-        telemetry.addData("B Threshold", ZONE_B_THRESH + "%");
-        telemetry.addData("C Threshold", ZONE_C_THRESH + "%");
+        top = mat.submat(topROI);
+        double topPercentage = Math.round(
+                Core.sumElems(top).val[0] / topROI.area() / 255 * 100);
+        bottom = mat.submat(bottomROI);
+        double bottomPercentage = Math.round(
+                Core.sumElems(bottom).val[0] / bottomROI.area() / 255 * 100);
+        telemetry.addData("Top", topPercentage + "%");
+        telemetry.addData("Bottom", bottomPercentage + "%");
+        telemetry.addData("Threshold", THRESH + "%");
 
+        mat.copyTo(input);
         // TODO: tune percentage thresholds
-        Scalar resultColor;
-        if (percentage > ZONE_C_THRESH) {
+        Scalar resultColor = new Scalar(255, 0, 0);
+        if (topPercentage > THRESH) {
             target = Target.C;
-            resultColor = new Scalar(255, 0, 0);
+            Imgproc.rectangle(input, topROI, resultColor);
         }
-        else if (percentage > ZONE_B_THRESH) {
+        else if (bottomPercentage > THRESH) {
             target = Target.B;
-            resultColor = new Scalar(0, 255, 0);
+            Imgproc.rectangle(input, bottomROI, resultColor);
         }
         else {
             target = Target.A;
-            resultColor = new Scalar(0, 0, 255);
+            Imgproc.rectangle(input, ringROI, resultColor);
         }
-
-        Imgproc.rectangle(mat, ringROI, resultColor);
         telemetry.addData("Target Zone", target.name());
         telemetry.update();
 
