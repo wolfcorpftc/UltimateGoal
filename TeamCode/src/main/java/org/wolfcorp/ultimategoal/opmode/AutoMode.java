@@ -61,7 +61,7 @@ public class AutoMode extends LinearOpMode {
             case UNSET:
             case C:
                 targetZoneA = new Pose2d(54, 54, Math.toRadians(-45));
-                targetZoneB = new Pose2d(66, 46, Math.toRadians(-45));
+                targetZoneB = new Pose2d(60, 46, Math.toRadians(-45));
                 break;
         }
 
@@ -88,14 +88,12 @@ public class AutoMode extends LinearOpMode {
 
         // Drop -> pick up rings
         Trajectory traj3 = drive.from(traj2.end())
-                .lineToLinearHeading(new Pose2d(traj2.end().getX(), 39, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(-12, 27, Math.toRadians(-30)))
                 .build();
 
-        Trajectory traj3a = drive.from(traj3.end())
-                .lineToLinearHeading(new Pose2d(-7, traj3.end().getY(), Math.toRadians(0)))
-                .build();
+        Trajectory traj3a = drive.from(traj3.end()).back(15).build();
 
-        Trajectory traj3b = drive.from(traj3a.end()).back(19).build();
+        Trajectory traj3b = drive.from(traj3a.end()).back(10).build();
 /*
         Trajectory traj3c = drive.from(traj3b.end()).forward(12).build();
 
@@ -104,14 +102,14 @@ public class AutoMode extends LinearOpMode {
         Trajectory traj3e = drive.from(traj3d.end()).forward(10).build();*/
 
         // Path to near wobble goal
-        Trajectory traj4 = drive.from(new Pose2d(traj3b.end().getX(), traj3b.end().getY(), Math.toRadians(180)))
-                .lineToLinearHeading(new Pose2d(-47, 44, Math.toRadians(180)))
+        Trajectory traj4 = drive.from(new Pose2d(traj3b.end().getX(), traj3b.end().getY(), Math.toRadians(187)))
+                .lineToLinearHeading(new Pose2d(-55, 44, Math.toRadians(180)))
                 .build();
 
         // Path to wobble goal
         Trajectory traj5 = drive.from(traj4.end())
                 .lineToLinearHeading(
-                        new Pose2d(-47, 36, Math.toRadians(180))
+                        new Pose2d(-55, 36, Math.toRadians(180))
                 )
                 .build();
 
@@ -148,10 +146,11 @@ public class AutoMode extends LinearOpMode {
         // Go back to pick up the rings
         scorer.intakeSlow();
         drive.follow(traj3);
-        scorer.outtakeOn(-50);
         drive.follow(traj3a);
         drive.follow(traj3b);
-        sleep(300);
+        drive.turn(Math.toRadians(23));
+        scorer.outtakeOn(-150);
+        sleep(1000);
         for (int i = 0; i < 4; i++) {
             sleep(300);
             scorer.stopperOpen();
@@ -177,13 +176,13 @@ public class AutoMode extends LinearOpMode {
         sleep(50);
         scorer.gripperClose();
 
-        // Drive to Zone C
-        // FIXME: INTAKE TOUCHES THE WALL
+        // Drive to Zone
         drive.follow(traj6);
 
         // Dropping wobble goal
         scorer.gripperOpen();
-        scorer.armIn();
+        // TODO: Make this a temporal marker
+        //scorer.armIn();
 
         // Parking maneuver
         drive.follow(traj7);

@@ -4,8 +4,10 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -20,6 +22,7 @@ public class TeleOpMode extends LinearOpMode {
         FtcDashboard dashboard = FtcDashboard.getInstance();
         Drivetrain drive = new Drivetrain(hardwareMap);
         Scorer scorer = new Scorer(hardwareMap);
+        ElapsedTime timer = new ElapsedTime();
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Message", "Hello Driver");
@@ -34,6 +37,7 @@ public class TeleOpMode extends LinearOpMode {
 
         scorer.openRelease();
 
+        timer.reset();
         while (opModeIsActive()) {
 
             TelemetryPacket packet = new TelemetryPacket();
@@ -71,6 +75,14 @@ public class TeleOpMode extends LinearOpMode {
             // Wobble Goal
             scorer.wobbleGripper(gamepad1.left_bumper || gamepad2.left_bumper, 200);
             scorer.wobbleArm(gamepad1.dpad_down || gamepad2.dpad_down, gamepad1.dpad_up || gamepad2.dpad_up);
+            if (timer.seconds() > 10) {
+                // purple
+                scorer.LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP2_HEARTBEAT_FAST);
+            }
+            else if (timer.seconds() > 5) {
+                // red
+                scorer.LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_HEARTBEAT_FAST);
+            }
 
             // TODO: add driver assist (auto-shoot using odom)
             // TODO: add button for manually resetting encoders after banging against wall

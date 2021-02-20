@@ -1,6 +1,7 @@
 package org.wolfcorp.ultimategoal.robot;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -13,7 +14,8 @@ import static java.lang.Thread.sleep;
 @Config
 public class Scorer {
     public DcMotorEx intake, outtake, arm;
-    public Servo gripper, stopper, release;
+    public Servo gripper, stopper, release, release2;
+    public RevBlinkinLedDriver LED;
 
     public boolean reverse = false;
     public int fireAmount = 0;
@@ -37,8 +39,9 @@ public class Scorer {
         outtake.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, outtakeCoeff);
         arm = hardwareMap.get(DcMotorEx.class, "arm");
         arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
         release = hardwareMap.get(Servo.class, "release");
+        release2 = hardwareMap.get(Servo.class, "release2");
+        LED = hardwareMap.get(RevBlinkinLedDriver.class, "LED");
         gripper = hardwareMap.get(Servo.class, "gripper");
         stopper = hardwareMap.get(Servo.class, "stopper");
     }
@@ -54,7 +57,7 @@ public class Scorer {
 
     public void toggleIntakeFlipper(boolean condition) {
         if (condition && flipperDelay.milliseconds() > 200) {
-            release.setPosition(release.getPosition() == 0.5 ? 0 : 0.5);
+            release2.setPosition(release2.getPosition() == 1 ? 0 : 1);
             flipperDelay.reset();
         }
     }
@@ -144,7 +147,7 @@ public class Scorer {
     }
 
     public void intakeSlow() {
-        intake.setPower(-0.8);
+        intake.setPower(-1);
     }
 
     public void intakeOff() {
@@ -152,11 +155,11 @@ public class Scorer {
     }
 
     public void outtakeOn() {
-        outtake.setVelocity(1500);
+        outtake.setVelocity(1580);
     }
 
     public void outtakeOn(int difference) {
-        outtake.setVelocity(1500+difference);
+        outtake.setVelocity(1580+difference);
     }
 
     public void outtakeOff() {
