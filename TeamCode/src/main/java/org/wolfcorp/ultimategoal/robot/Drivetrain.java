@@ -13,6 +13,7 @@ import com.acmerobotics.roadrunner.drive.MecanumDrive;
 import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
 import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.path.Path;
 import com.acmerobotics.roadrunner.profile.MotionProfile;
 import com.acmerobotics.roadrunner.profile.MotionProfileGenerator;
 import com.acmerobotics.roadrunner.profile.MotionState;
@@ -68,7 +69,6 @@ public class Drivetrain extends MecanumDrive {
     public static double HKI = 0;
     public static double HKD = 0;
 
-
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(TKP, TKI, TKD);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(HKP, HKI, HKD);
 
@@ -79,6 +79,7 @@ public class Drivetrain extends MecanumDrive {
     public static double OMEGA_WEIGHT = 1;
 
     public static int POSE_HISTORY_LIMIT = 100;
+    public static boolean DRAW_PATH_HISTORY = false;
 
     public double speedMultiplier = 1;
 
@@ -101,7 +102,7 @@ public class Drivetrain extends MecanumDrive {
     private TrajectoryFollower follower;
 
     private LinkedList<Pose2d> poseHistory;
-    private ArrayList<Trajectory> pathHistory;
+    private ArrayList<Path> pathHistory;
 
     public DcMotorEx leftFront, leftBack, rightBack, rightFront;
     private List<DcMotorEx> motors;
@@ -224,6 +225,8 @@ public class Drivetrain extends MecanumDrive {
     public void followAsync(Trajectory trajectory) {
         follower.followTrajectory(trajectory);
         mode = Drivetrain.Mode.FOLLOW_TRAJECTORY;
+        if (DRAW_PATH_HISTORY)
+            pathHistory.add(trajectory.getPath());
     }
 
     public void follow(Trajectory trajectory) {
@@ -289,7 +292,10 @@ public class Drivetrain extends MecanumDrive {
                         0, 0, targetAlpha
                 )));
 
-                Pose2d newPose = lastPoseOnTurn.copy(lastPoseOnTurn.getX(), lastPoseOnTurn.getY(), targetState.getX());
+                Pose2d newPose = lastPoseOnTurn.copy(
+                        lastPoseOnTurn.getX(),
+                        lastPoseOnTurn.getY(),
+                        targetState.getX());
 
                 fieldOverlay.setStroke("#4CAF50");
                 DashboardUtil.drawRobot(fieldOverlay, newPose);
@@ -304,16 +310,21 @@ public class Drivetrain extends MecanumDrive {
             case FOLLOW_TRAJECTORY: {
                 setDriveSignal(follower.update(currentPose));
 
-                Trajectory trajectory = follower.getTrajectory();
-
                 fieldOverlay.setStrokeWidth(1);
                 fieldOverlay.setStroke("#4CAF50");
-                DashboardUtil.drawSampledPath(fieldOverlay, trajectory.getPath());
-                double t = follower.elapsedTime();
-                DashboardUtil.drawRobot(fieldOverlay, trajectory.get(t));
+                if (DRAW_PATH_HISTORY) {
+                    for (Path path : pathHistory)
+                        DashboardUtil.drawSampledPath(fieldOverlay, path);
+                }
+                else {
+                    Trajectory trajectory = follower.getTrajectory();
+                    DashboardUtil.drawSampledPath(fieldOverlay, trajectory.getPath());
+                    double t = follower.elapsedTime();
+                    DashboardUtil.drawRobot(fieldOverlay, trajectory.get(t));
 
-                fieldOverlay.setStroke("#3F51B5");
-                DashboardUtil.drawPoseHistory(fieldOverlay, poseHistory);
+                    fieldOverlay.setStroke("#3F51B5");
+                    DashboardUtil.drawPoseHistory(fieldOverlay, poseHistory);
+                }
 
                 if (!follower.isFollowing()) {
                     mode = Drivetrain.Mode.IDLE;
@@ -324,9 +335,10 @@ public class Drivetrain extends MecanumDrive {
             }
         }
 
-        fieldOverlay.setStroke("#3F51B5");
-        DashboardUtil.drawRobot(fieldOverlay, currentPose);
-        //DashboardUtil.drawPoseHistory(fieldOverlay, poseHistory);
+        if (!DRAW_PATH_HISTORY) {
+            fieldOverlay.setStroke("#3F51B5");
+            DashboardUtil.drawRobot(fieldOverlay, currentPose);
+        }
 
         //dashboard.sendTelemetryPacket(packet);
     }
@@ -542,10 +554,10 @@ public class Drivetrain extends MecanumDrive {
         int leftBackTarget;
         int rightBackTarget;
 
-        leftTarget = leftFront.getCurrentPosition() + (int) (leftInches * COUNTS_PER_INCH);
-        rightTarget = rightFront.getCurrentPosition() + (int) (rightInches * COUNTS_PER_INCH);
-        leftBackTarget = leftBack.getCurrentPosition() + (int) (leftBackInches * COUNTS_PER_INCH);
-        rightBackTarget = rightBack.getCurrentPosition() + (int) (rightBackInches * COUNTS_PER_INCH);
+        leftTarget = leftFront.getCurrentPosition() + (int) (leftInches * DriveConstants.TICKS_PER_INCH);
+        rightTarget = rightFront.getCurrentPosition() + (int) (rightInches * DriveConstants.TICKS_PER_INCH);
+        leftBackTarget = leftBack.getCurrentPosition() + (int) (leftBackInches * DriveConstants.TICKS_PER_INCH);
+        rightBackTarget = rightBack.getCurrentPosition() + (int) (rightBackInches * DriveConstants.TICKS_PER_INCH);
 
         setDriveTargetPos(
                 leftTarget,
@@ -554,11 +566,14 @@ public class Drivetrain extends MecanumDrive {
                 rightBackTarget
         );
 
+        DcMotor.RunMode originalMode = leftFront.getMode();
         setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         ElapsedTime timer = new ElapsedTime();
         setMotorPowers(Math.abs(speed));
 
+        PIDCoefficients coeffs = new PIDCoefficients(0.05, 0.05, 0.005);
+        PIDFController controller = new PIDFController(coeffs);
         while ((timeoutSec <= 0 || timer.seconds() < timeoutSec)
                 && leftFront.isBusy()
                 && rightFront.isBusy()
@@ -568,7 +583,7 @@ public class Drivetrain extends MecanumDrive {
         }
 
         setMotorPowers(0);
-        setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        setMode(originalMode);
     }
 
     /** Same params but no timeout */
@@ -584,7 +599,7 @@ public class Drivetrain extends MecanumDrive {
     }
 
     public void forward(double speed, double distance, double timeoutSec) {
-        double converted = distance * DRIVE_CONVERSION;
+        double converted = distance;
         drive(speed, -converted, -converted, timeoutSec);
     }
 
@@ -593,8 +608,7 @@ public class Drivetrain extends MecanumDrive {
     }
 
     public void backward(double speed, double distance, double timeoutSec) {
-        double converted = distance * DRIVE_CONVERSION;
-        drive(speed, converted, converted, timeoutSec);
+        drive(speed, distance, distance, timeoutSec);
     }
 
     public void backward(double speed, double distance) {
@@ -602,22 +616,18 @@ public class Drivetrain extends MecanumDrive {
     }
 
     public void turnLeft(double speed, double degrees) {
-        double converted = degrees * DEG_CONVERSION;
-        drive(speed, converted, -converted, converted, -converted);
+        drive(speed, degrees, -degrees, degrees, -degrees);
     }
 
     public void turnRight(double speed, double degrees) {
-        double converted = degrees * DEG_CONVERSION;
-        drive(speed, -converted, converted, -converted, converted);
+        drive(speed, -degrees, degrees, -degrees, degrees);
     }
 
     public void sidestepRight(double speed, double distance) {
-        double converted = distance * DRIVE_CONVERSION;
-        drive(speed, converted, -converted, -converted, converted);
+        drive(speed, distance, -distance, -distance, distance);
     }
 
     public void sidestepLeft(double speed, double distance) {
-        double converted = distance * DRIVE_CONVERSION;
-        drive(speed, -converted, converted, converted, -converted);
+        drive(speed, -distance, distance, distance, -distance);
     }
 }
