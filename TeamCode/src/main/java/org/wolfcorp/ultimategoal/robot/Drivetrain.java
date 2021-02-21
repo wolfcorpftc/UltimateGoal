@@ -498,11 +498,13 @@ public class Drivetrain extends MecanumDrive {
     }
 
     public double[] aim(){
-        Pose2d position = getPoseEstimate();
+        Pose2d position = getPoseEstimate(); // current position
+        // distance from the goal
         double x = 72-position.getX();
         double y = 36-position.getY();
+        // solve for the desired pose using trig
         double distance = Math.sqrt(x*x+y*y);
         double degree = Math.toDegrees(Math.atan(-y/x));
-        return (new double[]{distance,degree});
+        return new double[]{distance,degree};
     }
 }
