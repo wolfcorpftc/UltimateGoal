@@ -85,7 +85,6 @@ public class TeleOpMode extends LinearOpMode {
                 scorer.LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_HEARTBEAT_FAST);
             }
 
-            // TODO: add driver assist (auto-shoot using odom)
             // TODO: add button for manually resetting encoders after banging against wall
             //  (odometry gets more and more inaccurate over time)
 
