@@ -93,7 +93,7 @@ public class AutoMode extends LinearOpMode {
 
         Trajectory traj3a = drive.from(traj3.end()).back(15).build();
 
-        Trajectory traj3b = drive.from(traj3a.end()).back(10).build();
+        Trajectory traj3b = drive.from(traj3a.end(),30,30).back(10).build();
 /*
         Trajectory traj3c = drive.from(traj3b.end()).forward(12).build();
 
@@ -103,13 +103,13 @@ public class AutoMode extends LinearOpMode {
 
         // Path to near wobble goal
         Trajectory traj4 = drive.from(new Pose2d(traj3b.end().getX(), traj3b.end().getY(), Math.toRadians(187)))
-                .lineToLinearHeading(new Pose2d(-55, 44, Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(-56, 44, Math.toRadians(180)))
                 .build();
 
         // Path to wobble goal
         Trajectory traj5 = drive.from(traj4.end())
                 .lineToLinearHeading(
-                        new Pose2d(-55, 36, Math.toRadians(180))
+                        new Pose2d(-56, 35, Math.toRadians(180))
                 )
                 .build();
 
@@ -148,10 +148,11 @@ public class AutoMode extends LinearOpMode {
         drive.follow(traj3);
         drive.follow(traj3a);
         drive.follow(traj3b);
+        sleep(500);
         drive.turn(Math.toRadians(23));
-        scorer.outtakeOn(-150);
+        scorer.outtakeOn(-300);
         sleep(1000);
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 5; i++) {
             sleep(300);
             scorer.stopperOpen();
             sleep(200);

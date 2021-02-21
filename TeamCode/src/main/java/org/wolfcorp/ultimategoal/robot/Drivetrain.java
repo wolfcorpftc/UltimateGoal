@@ -189,6 +189,13 @@ public class Drivetrain extends MecanumDrive {
         return new TrajectoryBuilder(startPose, startHeading, constraints);
     }
 
+    public TrajectoryBuilder from(Pose2d startPose, double maxVel, double maxAccel) {
+        DriveConstraints tempConstraints = new MecanumConstraints(BASE_CONSTRAINTS, TRACK_WIDTH);
+        tempConstraints.maxVel = maxVel;
+        tempConstraints.maxAccel = maxAccel;
+        return new TrajectoryBuilder(startPose, tempConstraints);
+    }
+
     public void turnAsync(double angle) {
         double heading = getPoseEstimate().getHeading();
 
@@ -316,6 +323,7 @@ public class Drivetrain extends MecanumDrive {
 
         fieldOverlay.setStroke("#3F51B5");
         DashboardUtil.drawRobot(fieldOverlay, currentPose);
+        //DashboardUtil.drawPoseHistory(fieldOverlay, poseHistory);
 
         //dashboard.sendTelemetryPacket(packet);
     }
