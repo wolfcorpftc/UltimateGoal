@@ -5,15 +5,11 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.wolfcorp.ultimategoal.robot.DriveConstants;
 import org.wolfcorp.ultimategoal.robot.Drivetrain;
 import org.wolfcorp.ultimategoal.robot.Scorer;
 import org.wolfcorp.ultimategoal.vision.BrightOpenCVZoneChooser;
-import org.wolfcorp.ultimategoal.vision.TFODZoneChooser;
 import org.wolfcorp.ultimategoal.vision.Target;
 import org.wolfcorp.ultimategoal.vision.ZoneChooser;
-
-import java.util.Arrays;
 
 @Autonomous(name="WCAuto")
 public class AutoMode extends LinearOpMode {
@@ -74,6 +70,7 @@ public class AutoMode extends LinearOpMode {
 
         drive.setPoseEstimate(initialPose);
 
+        // Plan paths with RoadRunner
         // Move and shoot
         Trajectory traj1 = drive
                 .from(initialPose)

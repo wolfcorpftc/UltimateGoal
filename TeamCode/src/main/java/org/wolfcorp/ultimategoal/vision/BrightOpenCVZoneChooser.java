@@ -42,24 +42,20 @@ public class BrightOpenCVZoneChooser extends OpenCvPipeline implements ZoneChoos
         // Hue: [0, 179]
         // Sat: [0, 255]
         // Val: [0, 255]
-        // TODO: tune color
+        // ring color range
         Scalar lowHSV = new Scalar(15 / 2.0, 100, 100);
         Scalar highHSV = new Scalar(45 / 2.0, 255, 255);
-
-        Core.inRange(mat, lowHSV, highHSV, mat);
-
+        Core.inRange(mat, lowHSV, highHSV, mat); // filter color; result is black-and-white
+        // extract regions where the rings are
         top = mat.submat(topROI);
+        bottom = mat.submat(bottomROI);
+        // calculate percentage of ring color on the image
         double topPercentage = Math.round(
                 Core.sumElems(top).val[0] / topROI.area() / 255 * 100);
-        bottom = mat.submat(bottomROI);
         double bottomPercentage = Math.round(
                 Core.sumElems(bottom).val[0] / bottomROI.area() / 255 * 100);
-        telemetry.addData("Top", topPercentage + "%");
-        telemetry.addData("Bottom", bottomPercentage + "%");
-        telemetry.addData("Threshold", THRESH + "%");
+        mat.copyTo(input); // copy the source mat to prevent memory leak
 
-        mat.copyTo(input);
-        // TODO: tune percentage thresholds
         Scalar resultColor = new Scalar(255, 0, 0);
         if (topPercentage > THRESH) {
             target = Target.C;
@@ -73,10 +69,14 @@ public class BrightOpenCVZoneChooser extends OpenCvPipeline implements ZoneChoos
             target = Target.A;
             Imgproc.rectangle(input, ringROI, resultColor);
         }
+
+        telemetry.addData("Top", topPercentage + "%");
+        telemetry.addData("Bottom", bottomPercentage + "%");
+        telemetry.addData("Threshold", THRESH + "%");
         telemetry.addData("Target Zone", target.name());
         telemetry.update();
 
-        return mat;
+        return input;
     }
 
     public void init(HardwareMap hardwareMap, Telemetry telemetry) {

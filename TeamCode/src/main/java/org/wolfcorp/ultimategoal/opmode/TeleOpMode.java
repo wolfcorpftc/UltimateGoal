@@ -1,7 +1,6 @@
 package org.wolfcorp.ultimategoal.opmode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
@@ -75,16 +74,17 @@ public class TeleOpMode extends LinearOpMode {
             // Wobble Goal
             scorer.wobbleGripper(gamepad1.left_bumper || gamepad2.left_bumper, 200);
             scorer.wobbleArm(gamepad1.dpad_down || gamepad2.dpad_down, gamepad1.dpad_up || gamepad2.dpad_up);
-            if (timer.seconds() > 10) {
-                // purple
+
+            // LED vision signal
+            if (timer.seconds() > 110) {
+                // reminder for power shots
                 scorer.LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP2_HEARTBEAT_FAST);
             }
-            else if (timer.seconds() > 5) {
-                // red
+            else if (timer.seconds() > 85) {
+                // reminder for wobble goals / signal endgame
                 scorer.LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_HEARTBEAT_FAST);
             }
 
-            // TODO: add driver assist (auto-shoot using odom)
             // TODO: add button for manually resetting encoders after banging against wall
             //  (odometry gets more and more inaccurate over time)
 
