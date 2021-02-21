@@ -30,6 +30,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -100,6 +101,7 @@ public class Drivetrain extends MecanumDrive {
     private TrajectoryFollower follower;
 
     private LinkedList<Pose2d> poseHistory;
+    private ArrayList<Trajectory> pathHistory;
 
     public DcMotorEx leftFront, leftBack, rightBack, rightFront;
     private List<DcMotorEx> motors;
@@ -127,6 +129,7 @@ public class Drivetrain extends MecanumDrive {
                 new Pose2d(0.5, 0.5, Math.toRadians(5.0)), 0.5);
 
         poseHistory = new LinkedList<>();
+        pathHistory = new ArrayList<>();
 
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
@@ -514,5 +517,107 @@ public class Drivetrain extends MecanumDrive {
         double distance = Math.sqrt(x*x+y*y);
         double degree = Math.toDegrees(Math.atan(-y/x));
         return new double[]{distance,degree};
+    }
+
+    public void setDriveTargetPos(int lf, int rf,
+                                  int lb, int rb) {
+        leftFront.setTargetPosition(lf);
+        rightFront.setTargetPosition(rf);
+        leftBack.setTargetPosition(lb);
+        rightBack.setTargetPosition(rb);
+    }
+    /*
+     *  Method to perfmorm a relative move, based on encoder counts.
+     *  Encoders are not reset as the move is based on the current position.
+     *  Move will stop if any of three conditions occur:
+     *  1) Move gets to the desired position (unless timeout has been reached)
+     *  2) Driver stops the opmode running.
+     */
+    public void drive(double speed,
+                      double leftInches, double rightInches,
+                      double leftBackInches, double rightBackInches,
+                      double timeoutSec) {
+        int leftTarget;
+        int rightTarget;
+        int leftBackTarget;
+        int rightBackTarget;
+
+        leftTarget = leftFront.getCurrentPosition() + (int) (leftInches * COUNTS_PER_INCH);
+        rightTarget = rightFront.getCurrentPosition() + (int) (rightInches * COUNTS_PER_INCH);
+        leftBackTarget = leftBack.getCurrentPosition() + (int) (leftBackInches * COUNTS_PER_INCH);
+        rightBackTarget = rightBack.getCurrentPosition() + (int) (rightBackInches * COUNTS_PER_INCH);
+
+        setDriveTargetPos(
+                leftTarget,
+                rightTarget,
+                leftBackTarget,
+                rightBackTarget
+        );
+
+        setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        ElapsedTime timer = new ElapsedTime();
+        setMotorPowers(Math.abs(speed));
+
+        while ((timeoutSec <= 0 || timer.seconds() < timeoutSec)
+                && leftFront.isBusy()
+                && rightFront.isBusy()
+                && leftBack.isBusy()
+                && rightBack.isBusy()) {
+            setMotorPowers(Math.abs(speed) + controller.update(leftFront.getCurrentPosition()));
+        }
+
+        setMotorPowers(0);
+        setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    /** Same params but no timeout */
+    public void drive(double speed,
+                      double leftInches, double rightInches,
+                      double leftBackInches, double rightBackInches) {
+        drive(speed, leftInches, rightInches, leftBackInches, rightBackInches, -1);
+    }
+
+    /** Same params but no timeout nor back motor args */
+    public void drive(double speed, double leftInches, double rightInches, double timeoutSec) {
+        drive(speed, leftInches, rightInches, leftInches, rightInches, timeoutSec);
+    }
+
+    public void forward(double speed, double distance, double timeoutSec) {
+        double converted = distance * DRIVE_CONVERSION;
+        drive(speed, -converted, -converted, timeoutSec);
+    }
+
+    public void forward(double speed, double distance) {
+        forward(speed, distance, -1);
+    }
+
+    public void backward(double speed, double distance, double timeoutSec) {
+        double converted = distance * DRIVE_CONVERSION;
+        drive(speed, converted, converted, timeoutSec);
+    }
+
+    public void backward(double speed, double distance) {
+        backward(speed, distance, -1);
+    }
+
+    public void turnLeft(double speed, double degrees) {
+        double converted = degrees * DEG_CONVERSION;
+        drive(speed, converted, -converted, converted, -converted);
+    }
+
+    public void turnRight(double speed, double degrees) {
+        double converted = degrees * DEG_CONVERSION;
+        drive(speed, -converted, converted, -converted, converted);
+    }
+
+    public void sidestepRight(double speed, double distance) {
+        double converted = distance * DRIVE_CONVERSION;
+        drive(speed, converted, -converted, -converted, converted);
+    }
+
+    public void sidestepLeft(double speed, double distance) {
+        double converted = distance * DRIVE_CONVERSION;
+        drive(speed, -converted, converted, converted, -converted);
     }
 }

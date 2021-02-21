@@ -16,11 +16,14 @@ import org.wolfcorp.ultimategoal.robot.Scorer;
 
 @TeleOp(name="Current TeleOp", group = "drive")
 public class TeleOpMode extends LinearOpMode {
+    Drivetrain drive;
+    Scorer scorer;
+
     @Override
     public void runOpMode() {
         FtcDashboard dashboard = FtcDashboard.getInstance();
-        Drivetrain drive = new Drivetrain(hardwareMap);
-        Scorer scorer = new Scorer(hardwareMap);
+        drive = new Drivetrain(hardwareMap);
+        scorer = new Scorer(hardwareMap);
         ElapsedTime timer = new ElapsedTime();
 
         // Send telemetry message to signify robot waiting;
@@ -75,6 +78,9 @@ public class TeleOpMode extends LinearOpMode {
             scorer.wobbleGripper(gamepad1.left_bumper || gamepad2.left_bumper, 200);
             scorer.wobbleArm(gamepad1.dpad_down || gamepad2.dpad_down, gamepad1.dpad_up || gamepad2.dpad_up);
 
+            // Powershot
+            powershot(gamepad1.back);
+
             // LED vision signal
             if (timer.seconds() > 110) {
                 // reminder for power shots
@@ -95,6 +101,23 @@ public class TeleOpMode extends LinearOpMode {
 
             dashboard.sendTelemetryPacket(packet);
             drive.update(); // odometry update
+        }
+    }
+
+    public void powershot(boolean condition) {
+        if (condition && drive != null && scorer != null) {
+            double sleepDuration = 200;
+            scorer.outtakeOn();
+            drive.sidestepLeft(1, 10);
+            scorer.stopperOpen();
+            sleep(sleepDuration);
+            drive.sidestepLeft(1, 7.5);
+            scorer.stopperOpen();
+            sleep(sleepDuration);
+            drive.sidestepLeft(1, 7.5);
+            scorer.stopperOpen();
+            sleep(sleepDuration);
+            scorer.outtakeOff();
         }
     }
 }
