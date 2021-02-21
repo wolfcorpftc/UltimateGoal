@@ -497,7 +497,7 @@ public class Drivetrain extends MecanumDrive {
         System.out.println(angle);
     }
 
-    public double[] trueAimBot(){
+    public double[] aim(){
         Pose2d position = getPoseEstimate();
         double x = 72-position.getX();
         double y = 36-position.getY();
