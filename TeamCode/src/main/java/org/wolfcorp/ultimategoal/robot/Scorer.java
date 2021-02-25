@@ -175,7 +175,7 @@ public class Scorer {
     }
 
     public void openRelease() {
-        release.setPosition(0.5);
+        release.setPosition(1);
     }
 
     public void pause(int milliseconds) {

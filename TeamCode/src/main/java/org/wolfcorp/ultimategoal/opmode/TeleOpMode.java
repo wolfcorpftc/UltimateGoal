@@ -1,8 +1,10 @@
 package org.wolfcorp.ultimategoal.opmode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -14,6 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.wolfcorp.ultimategoal.robot.Drivetrain;
 import org.wolfcorp.ultimategoal.robot.Scorer;
 
+@Config
 @TeleOp(name="Current TeleOp", group = "drive")
 public class TeleOpMode extends LinearOpMode {
     Drivetrain drive;
@@ -104,19 +107,35 @@ public class TeleOpMode extends LinearOpMode {
         }
     }
 
+    public static double SIDESTEP_1 = 23;
+    public static double SIDESTEP_2 = 15.5;
+    public static double SIDESTEP_3 = 13.75;
+
     public void powershot(boolean condition) {
         if (condition && drive != null && scorer != null) {
-            long sleepDuration = 250;
+            Trajectory traj1 = drive.from(drive.getPoseEstimate())
+                    .strafeLeft(SIDESTEP_1)
+                    .build();
+            Trajectory traj2 = drive.from(traj1.end())
+                    .strafeLeft(SIDESTEP_2)
+                    .build();
+            Trajectory traj3 = drive.from(traj2.end())
+                    .strafeLeft(SIDESTEP_3)
+                    .build();
+            long sleepDuration = 340;
             scorer.outtakeOn();
-            drive.sidestepLeft(1, 10);
+            sleep(700);
+            drive.follow(traj1);
             scorer.stopperOpen();
             sleep(sleepDuration);
             scorer.stopperClose();
-            drive.sidestepLeft(1, 7.5);
+            drive.follow(traj2);
+            sleep(sleepDuration);
             scorer.stopperOpen();
             sleep(sleepDuration);
             scorer.stopperClose();
-            drive.sidestepLeft(1, 7.5);
+            drive.follow(traj3);
+            sleep(sleepDuration);
             scorer.stopperOpen();
             sleep(sleepDuration);
             scorer.stopperClose();

@@ -111,13 +111,13 @@ public class AutoMode2 extends LinearOpMode {
 
         // Path to near wobble goal
         Trajectory traj4 = drive.from(new Pose2d(traj3b.end().getX(), traj3b.end().getY(), Math.toRadians(180)))
-                .lineToLinearHeading(new Pose2d(-57, 44, Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(-54, 44, Math.toRadians(180)))
                 .build();
 
         // Path to wobble goal
         Trajectory traj5 = drive.from(traj4.end())
                 .lineToLinearHeading(
-                        new Pose2d(-57, 35, Math.toRadians(180))
+                        new Pose2d(-54, 35, Math.toRadians(180))
                 )
                 .build();
 
