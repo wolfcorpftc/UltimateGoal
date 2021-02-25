@@ -106,17 +106,20 @@ public class TeleOpMode extends LinearOpMode {
 
     public void powershot(boolean condition) {
         if (condition && drive != null && scorer != null) {
-            long sleepDuration = 200;
+            long sleepDuration = 250;
             scorer.outtakeOn();
             drive.sidestepLeft(1, 10);
             scorer.stopperOpen();
             sleep(sleepDuration);
+            scorer.stopperClose();
             drive.sidestepLeft(1, 7.5);
             scorer.stopperOpen();
             sleep(sleepDuration);
+            scorer.stopperClose();
             drive.sidestepLeft(1, 7.5);
             scorer.stopperOpen();
             sleep(sleepDuration);
+            scorer.stopperClose();
             scorer.outtakeOff();
         }
     }
