@@ -13,7 +13,7 @@ import static java.lang.Thread.sleep;
 
 @Config
 public class Scorer {
-    public DcMotorEx intake, outtake, arm;
+    public DcMotorEx intake, outtake, arm, flipper;
     public Servo gripper, stopper, release, release2;
     public RevBlinkinLedDriver LED;
 
@@ -44,6 +44,8 @@ public class Scorer {
         LED = hardwareMap.get(RevBlinkinLedDriver.class, "LED");
         gripper = hardwareMap.get(Servo.class, "gripper");
         stopper = hardwareMap.get(Servo.class, "stopper");
+        flipper = hardwareMap.get(DcMotorEx.class, "flipper");
+        flipper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     public void toggleIntake(boolean condition, double speed, int toggleDelay) {
@@ -126,7 +128,7 @@ public class Scorer {
 
     public void armOut(){
         arm.setPower(1);
-        pause(570);
+        pause(500);
         arm.setPower(0);
     }
 
@@ -142,6 +144,16 @@ public class Scorer {
         intake.setPower(0);
     }
 
+    public void moveFlipper(boolean up, boolean down) {
+        if (up) {
+            flipper.setPower(-0.3);
+        } else if (down) {
+            flipper.setPower(0.3);
+        } else {
+            flipper.setPower(0);
+        }
+    }
+
     public void intakeOn() {
         intake.setPower(-1);
     }
@@ -155,11 +167,11 @@ public class Scorer {
     }
 
     public void outtakeOn() {
-        outtake.setVelocity(1580);
+        outtake.setVelocity(1520);
     }
 
     public void outtakeOn(int difference) {
-        outtake.setVelocity(1580+difference);
+        outtake.setVelocity(1520+difference);
     }
 
     public void outtakeOff() {
@@ -175,7 +187,7 @@ public class Scorer {
     }
 
     public void openRelease() {
-        release.setPosition(1);
+        release.setPosition(0.75);
     }
 
     public void pause(int milliseconds) {
