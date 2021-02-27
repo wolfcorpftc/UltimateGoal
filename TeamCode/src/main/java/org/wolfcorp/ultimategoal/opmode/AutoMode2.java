@@ -19,7 +19,7 @@ public class AutoMode2 extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Drivetrain drive = new Drivetrain(hardwareMap);
+        Drivetrain drive = new Drivetrain(hardwareMap, true);
         // To change the vision algorithm, change the constructor used
         //chooser = new TFODZoneChooser();
         //chooser.init(hardwareMap, telemetry);
@@ -56,8 +56,8 @@ public class AutoMode2 extends LinearOpMode {
             default:
             case UNSET:
             case C:
-                targetZoneA = new Pose2d(54, 54, Math.toRadians(-45));
-                targetZoneB = new Pose2d(60, 50, Math.toRadians(-45));
+                targetZoneA = new Pose2d(46, 54, Math.toRadians(-45));
+                targetZoneB = new Pose2d(49, 50, Math.toRadians(-45));
                 break;
         }
 
@@ -73,7 +73,7 @@ public class AutoMode2 extends LinearOpMode {
         // Move and shoot
         Trajectory traj1 = drive
                 .from(initialPose)
-                .lineToLinearHeading(new Pose2d(-14, 52, Math.toRadians(-8)))
+                .lineToLinearHeading(new Pose2d(-14, 52, Math.toRadians(-10)))
                 .build();
 
         // Shoot -> drop wobble goal
@@ -88,14 +88,14 @@ public class AutoMode2 extends LinearOpMode {
                 .build();
 
         Trajectory traj3Z = drive.from(traj3.end())
-                .lineToLinearHeading(new Pose2d(-12, 36, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(-12, 37, Math.toRadians(3)))
                 .build();
 
-        Trajectory traj3a = drive.from(traj3Z.end()).back(15)
+        Trajectory traj3a = drive.from(traj3Z.end()).back(10)
                 .addTemporalMarker(0, scorer::stopperClose)
                 .build();
 
-        Trajectory traj3b = drive.from(traj3a.end(),30,30).back(10)
+        Trajectory traj3b = drive.from(traj3a.end(),30,30).back(15)
                 .addTemporalMarker(0, scorer::stopperOpen)
                 .addTemporalMarker(0.34, scorer::stopperClose)
                 .addTemporalMarker(0.34, () -> {
@@ -111,13 +111,13 @@ public class AutoMode2 extends LinearOpMode {
 
         // Path to near wobble goal
         Trajectory traj4 = drive.from(new Pose2d(traj3b.end().getX(), traj3b.end().getY(), Math.toRadians(180)))
-                .lineToLinearHeading(new Pose2d(-54, 44, Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(-56, 44, Math.toRadians(180)))
                 .build();
 
         // Path to wobble goal
         Trajectory traj5 = drive.from(traj4.end())
                 .lineToLinearHeading(
-                        new Pose2d(-54, 35, Math.toRadians(180))
+                        new Pose2d(-56, 37, Math.toRadians(180))
                 )
                 .build();
 
@@ -128,7 +128,7 @@ public class AutoMode2 extends LinearOpMode {
 
         // Path to Park
         Trajectory traj7 = drive.from(traj6.end())
-                .lineToLinearHeading(new Pose2d(12, 36, traj6.end().getHeading()))
+                .lineToLinearHeading(new Pose2d(12, 36,0))
                 .build();
 
         scorer.gripperClose();
@@ -193,5 +193,6 @@ public class AutoMode2 extends LinearOpMode {
 
         // Parking maneuver
         drive.follow(traj7);
+        drive.turnTo(0);
     }
 }

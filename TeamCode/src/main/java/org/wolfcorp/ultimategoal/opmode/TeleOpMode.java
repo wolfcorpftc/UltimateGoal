@@ -49,7 +49,7 @@ public class TeleOpMode extends LinearOpMode {
             // Drivetrain
             drive.drive(-gamepad1.right_stick_y,
                     gamepad1.right_stick_x,
-                    gamepad1.left_stick_x, 0.4, gamepad1.right_bumper);
+                    gamepad1.left_stick_x, 0.4, gamepad1.right_trigger > 0.8);
 /*
             if(gamepad1.right_trigger > 0.8) {
                 *//*double[] arr = drive.trueAimBot();
@@ -64,7 +64,7 @@ public class TeleOpMode extends LinearOpMode {
                 }*//*
 
             }*/
-            drive.turnForward(gamepad1.right_trigger > 0.8);
+            drive.turnForward(gamepad1.right_bumper);
 
             // Reversing scoring mechanisms
             scorer.reverse(gamepad1.b, 200);
@@ -80,6 +80,7 @@ public class TeleOpMode extends LinearOpMode {
             // Wobble Goal
             scorer.wobbleGripper(gamepad1.left_bumper || gamepad2.left_bumper, 200);
             scorer.wobbleArm(gamepad1.dpad_down || gamepad2.dpad_down, gamepad1.dpad_up || gamepad2.dpad_up);
+            scorer.moveFlipper(gamepad2.b && !gamepad2.start, gamepad2.x);
 
             // Powershot
             powershot(gamepad1.back);
@@ -107,23 +108,32 @@ public class TeleOpMode extends LinearOpMode {
         }
     }
 
-    public static double SIDESTEP_1 = 23;
-    public static double SIDESTEP_2 = 15.5;
-    public static double SIDESTEP_3 = 13.75;
+    public static double SIDESTEP_1 = 24;
+    public static double SIDESTEP_2 = 4.5;
+    public static double SIDESTEP_3 = 14;
 
     public void powershot(boolean condition) {
+
         if (condition && drive != null && scorer != null) {
+            Pose2d current = new Pose2d(0, -24 + 7, 0);
+            drive.setPoseEstimate(current);
+            Pose2d pose1 = new Pose2d(current.getX(), current.getY() + SIDESTEP_1, 0);
+            Pose2d pose2 = new Pose2d(pose1.getX(), pose1.getY() + SIDESTEP_2, 0);
+            Pose2d pose3 = new Pose2d(pose2.getX(), pose2.getY() + SIDESTEP_3, 0);
             Trajectory traj1 = drive.from(drive.getPoseEstimate())
-                    .strafeLeft(SIDESTEP_1)
+                    //.strafeLeft(SIDESTEP_1)
+                    .lineToLinearHeading(pose1)
                     .build();
             Trajectory traj2 = drive.from(traj1.end())
-                    .strafeLeft(SIDESTEP_2)
+                    //.strafeLeft(SIDESTEP_2)
+                    .lineToLinearHeading(pose2)
                     .build();
             Trajectory traj3 = drive.from(traj2.end())
-                    .strafeLeft(SIDESTEP_3)
+                    //.strafeLeft(SIDESTEP_3)
+                    .lineToLinearHeading(pose3)
                     .build();
             long sleepDuration = 340;
-            scorer.outtakeOn();
+            scorer.outtakeOn(-100);
             sleep(700);
             drive.follow(traj1);
             scorer.stopperOpen();

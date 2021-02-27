@@ -79,7 +79,7 @@ public class Drivetrain extends MecanumDrive {
     public static double OMEGA_WEIGHT = 1;
 
     public static int POSE_HISTORY_LIMIT = 100;
-    public static boolean DRAW_PATH_HISTORY = false;
+    public static boolean DRAW_PATH_HISTORY = true;
 
     public double speedMultiplier = 1;
 
@@ -106,13 +106,17 @@ public class Drivetrain extends MecanumDrive {
 
     public DcMotorEx leftFront, leftBack, rightBack, rightFront;
     private List<DcMotorEx> motors;
-    public BNO055IMU imu;
+    public static BNO055IMU imu;
 
     private VoltageSensor batteryVoltageSensor;
 
     private Pose2d lastPoseOnTurn;
 
     public Drivetrain(HardwareMap hardwareMap) {
+        this(hardwareMap, false);
+    }
+
+    public Drivetrain(HardwareMap hardwareMap, boolean resetIMU) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
 
         dashboard = FtcDashboard.getInstance();
@@ -141,10 +145,12 @@ public class Drivetrain extends MecanumDrive {
         }
 
         // TODO: adjust the names of the following hardware devices to match your configuration
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-        imu.initialize(parameters);
+        if (imu == null || resetIMU || 1==1) {
+            imu = hardwareMap.get(BNO055IMU.class, "imu");
+            BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+            parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+            imu.initialize(parameters);
+        }
 
         // TODO: if your hub is mounted vertically, remap the IMU axes so that the z-axis points
         // upward (normal to the floor) using a command like the following:
@@ -516,8 +522,10 @@ public class Drivetrain extends MecanumDrive {
 
     public void turnForward(boolean condition) {
         double angle = Math.toRadians(-imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
+        System.out.println(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES));
         if (condition) turn(angle);
-        System.out.println(angle);
+        System.out.println();
+        System.out.println("angle" + angle);
     }
 
     public double[] aim(){
