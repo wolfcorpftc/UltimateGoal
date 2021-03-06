@@ -17,15 +17,15 @@ import org.wolfcorp.ultimategoal.robot.Drivetrain;
 import org.wolfcorp.ultimategoal.robot.Scorer;
 
 @Config
-@TeleOp(name="Current TeleOp", group = "drive")
-public class TeleOpMode extends LinearOpMode {
+@TeleOp(name="Testing TeleOp", group = "drive")
+public class TeleOpMode2 extends LinearOpMode {
     Drivetrain drive;
     Scorer scorer;
 
     @Override
     public void runOpMode() {
         FtcDashboard dashboard = FtcDashboard.getInstance();
-        drive = new Drivetrain(hardwareMap);
+        drive = new Drivetrain(hardwareMap, true);
         drive.setTelemetry(false);
         scorer = new Scorer(hardwareMap);
         ElapsedTime timer = new ElapsedTime();
@@ -48,8 +48,10 @@ public class TeleOpMode extends LinearOpMode {
 
             TelemetryPacket packet = new TelemetryPacket();
             // Drivetrain
-            drive.drive(-gamepad1.right_stick_y,
-                    gamepad1.right_stick_x,
+            double angle = -drive.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
+
+            drive.drive(-gamepad1.right_stick_y * Math.cos(angle) + gamepad1.right_stick_x * Math.sin(angle),
+                    gamepad1.right_stick_y * Math.sin(angle) + gamepad1.right_stick_x * Math.cos(angle),
                     gamepad1.left_stick_x, 0.4, gamepad1.right_trigger > 0.8);
 /*
             if(gamepad1.right_trigger > 0.8) {
@@ -72,9 +74,6 @@ public class TeleOpMode extends LinearOpMode {
 
             // Intake
             scorer.toggleIntake(gamepad1.a && !gamepad1.start, 1, 200);
-            if(gamepad1.a && !gamepad1.start){
-                scorer.resetIntakeDipFlag();
-            }
             scorer.toggleIntakeFlipper(gamepad1.dpad_right || gamepad2.right_bumper);
 
             // Outtake
@@ -92,27 +91,21 @@ public class TeleOpMode extends LinearOpMode {
             // LED vision signal
             if (timer.seconds() > 110) {
                 // reminder for power shots
-                scorer.LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_HEARTBEAT_FAST);
+                scorer.LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP2_HEARTBEAT_FAST);
             }
             else if (timer.seconds() > 85) {
                 // reminder for wobble goals / signal endgame
-                scorer.LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP2_HEARTBEAT_FAST);
+                scorer.LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_HEARTBEAT_FAST);
             }
 
             // TODO: add button for manually resetting encoders after banging against wall
             //  (odometry gets more and more inaccurate over time)
 
-/*            packet.put("vel", scorer.outtake.getVelocity());
+            packet.put("vel", scorer.outtake.getVelocity());
             packet.put("shoot", scorer.stopper.getPosition() < 0.34 ? 2200 : 1500);
             packet.put("robot speed", drive.rightFront.getPower());
             packet.put("heading", drive.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
 
-            dashboard.sendTelemetryPacket(packet);*/
-
-            // Detect rings from intake
-            scorer.updateRingCount();
-            packet.put("intake rings", scorer.intakeRings);
-            packet.put("intake vel", Math.abs(scorer.intake.getVelocity()));
             dashboard.sendTelemetryPacket(packet);
             drive.update(); // odometry update
         }
@@ -121,7 +114,7 @@ public class TeleOpMode extends LinearOpMode {
     public static double ALIGN_STRAFE = 5;
     public static double SIDESTEP_1 = 24;
     public static double SIDESTEP_2 = 4.5;
-    public static double SIDESTEP_3 = 11;
+    public static double SIDESTEP_3 = 14;
 
     public void powershot(boolean condition) {
 
@@ -129,12 +122,12 @@ public class TeleOpMode extends LinearOpMode {
             Trajectory align = drive.from(drive.getPoseEstimate(), 10, 10)
                     .strafeRight(ALIGN_STRAFE)
                     .build();
-            Pose2d wall = new Pose2d(0, -24 + 7, 0);
-            //drive.setPoseEstimate(current);
-            Pose2d pose1 = new Pose2d(wall.getX(), wall.getY() + SIDESTEP_1, 0);
+            Pose2d current = new Pose2d(0, -24 + 7, 0);
+            drive.setPoseEstimate(current);
+            Pose2d pose1 = new Pose2d(current.getX(), current.getY() + SIDESTEP_1, 0);
             Pose2d pose2 = new Pose2d(pose1.getX(), pose1.getY() + SIDESTEP_2, 0);
             Pose2d pose3 = new Pose2d(pose2.getX(), pose2.getY() + SIDESTEP_3, 0);
-            Trajectory traj1 = drive.from(wall)
+            Trajectory traj1 = drive.from(drive.getPoseEstimate())
                     //.strafeLeft(SIDESTEP_1)
                     .lineToLinearHeading(pose1)
                     .build();
@@ -148,9 +141,6 @@ public class TeleOpMode extends LinearOpMode {
                     .build();
             long sleepDuration = 340;
             scorer.outtakeOn(-100);
-            drive.follow(align);
-            //drive.sidestepRight(0.5, ALIGN_STRAFE);
-            drive.setPoseEstimate(wall);
             sleep(700);
             drive.follow(traj1);
             scorer.stopperOpen();

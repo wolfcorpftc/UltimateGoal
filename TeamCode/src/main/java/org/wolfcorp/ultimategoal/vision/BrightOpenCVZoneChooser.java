@@ -54,9 +54,10 @@ public class BrightOpenCVZoneChooser extends OpenCvPipeline implements ZoneChoos
                 Core.sumElems(top).val[0] / topROI.area() / 255 * 100);
         double bottomPercentage = Math.round(
                 Core.sumElems(bottom).val[0] / bottomROI.area() / 255 * 100);
-        mat.copyTo(input); // copy the source mat to prevent memory leak
+        //mat.copyTo(input); // use grayscale for debugging
+        mat.release(); // use color imaged for book
 
-        Scalar resultColor = new Scalar(255, 0, 0);
+        Scalar resultColor = new Scalar(255, 0, 255);
         if (topPercentage > THRESH) {
             target = Target.C;
             Imgproc.rectangle(input, topROI, resultColor);

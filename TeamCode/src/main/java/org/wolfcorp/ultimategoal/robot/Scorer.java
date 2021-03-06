@@ -20,6 +20,11 @@ public class Scorer {
     public boolean reverse = false;
     public int fireAmount = 0;
 
+    public int intakeRingDelta = 0;
+    private int intakeDipFlag = -1;
+    private double lastIntakeVel = 0;
+    public int intakeRings = 0;
+
     public static PIDFCoefficients outtakeCoeff = new PIDFCoefficients(45, 0.16, 0, 16);
 
     private boolean xclick = true;
@@ -84,6 +89,8 @@ public class Scorer {
             if (fireDelay.milliseconds() > 680) {
                 fireDelay.reset();
                 fireAmount--;
+                intakeRingDelta--;
+                intakeRings--;
             } else if (fireDelay.milliseconds() > 340) {
                 stopperClose();
             } else {
@@ -113,6 +120,7 @@ public class Scorer {
         if (condition && reverseDelay.milliseconds() > toggleDelay) {
             reverse = !reverse;
             reverseDelay.reset();
+            intakeRingDelta--;
         }
     }
 
@@ -155,15 +163,26 @@ public class Scorer {
     }
 
     public void intakeOn() {
-        intake.setPower(-1);
+        //intake.setPower(-1);
+        intake.setVelocity(-2400);
+        intakeRings = 0;
+        intakeRingDelta = 0;
+        lastIntakeVel = 0;
     }
 
     public void intakeSlow() {
-        intake.setPower(-1);
+        //intake.setPower(-1);
+        intake.setVelocity(-2400);
+        intakeRings = 0;
+        intakeRingDelta = 0;
+        lastIntakeVel = 0;
     }
 
     public void intakeOff() {
         intake.setPower(0);
+        intakeRings = 0;
+        intakeRingDelta = 0;
+        lastIntakeVel = 0;
     }
 
     public void outtakeOn() {
@@ -196,5 +215,66 @@ public class Scorer {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+
+    public void resetIntakeDipFlag() {
+        intakeDipFlag = -1;
+    }
+
+    public void updateRingCount() {
+        double currentIntakeVel = -intake.getVelocity();
+
+        if (currentIntakeVel<1300 && intakeDipFlag == 1){
+            // two-ring dip
+            intakeDipFlag = 2;
+        }
+        else if(currentIntakeVel>2300 && intakeDipFlag == 1){
+            // return from one-ring dip
+            intakeRings++;
+            intakeDipFlag = 0;
+        }
+        else if(currentIntakeVel>2300 && intakeDipFlag == 2){
+            // return from two-ring dip
+            intakeRings+=2;
+            intakeDipFlag = 0;
+        }
+        else if(currentIntakeVel>2300){
+            // intake running
+            intakeDipFlag = 0;
+        }
+        else if(currentIntakeVel<2200 && intakeDipFlag == 0){
+            // one-ring dip
+            intakeDipFlag = 1;
+        }
+
+        if (intakeRings >= 3) {
+            LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP2_HEARTBEAT_FAST);
+        }
+
+        /*
+        if (currentIntakeVel == 0) {
+            intakeRings = 0;
+            return;
+        }
+        final double INTAKE_VEL_THRESH = 2200;
+        if (!intakeDipFlag
+                && lastIntakeVel > INTAKE_VEL_THRESH
+                && currentIntakeVel < INTAKE_VEL_THRESH) {
+            intakeDipFlag = true;
+        }
+        else if (intakeDipFlag
+                && lastIntakeVel < INTAKE_VEL_THRESH
+                && currentIntakeVel > INTAKE_VEL_THRESH) {
+            intakeDipFlag = false;
+            intakeRings++;
+        }
+        intakeRings += intakeRingDelta;
+        intakeRingDelta = 0;
+        if (intakeRings < 0)
+            intakeRings = 0;
+
+        lastIntakeVel = currentIntakeVel;
+        */
     }
 }

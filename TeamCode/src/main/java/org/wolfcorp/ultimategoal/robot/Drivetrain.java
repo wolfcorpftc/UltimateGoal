@@ -89,6 +89,8 @@ public class Drivetrain extends MecanumDrive {
         FOLLOW_TRAJECTORY
     }
 
+    private boolean useTelemetry = false;
+
     private FtcDashboard dashboard;
     private NanoClock clock;
 
@@ -252,6 +254,10 @@ public class Drivetrain extends MecanumDrive {
         throw new AssertionError();
     }
 
+    public void setTelemetry(boolean enable) {
+        useTelemetry = enable;
+    }
+
     public void update() {
         updatePoseEstimate();
 
@@ -346,7 +352,8 @@ public class Drivetrain extends MecanumDrive {
             DashboardUtil.drawRobot(fieldOverlay, currentPose);
         }
 
-        //dashboard.sendTelemetryPacket(packet);
+        if (useTelemetry)
+            dashboard.sendTelemetryPacket(packet);
     }
 
     public void waitForIdle() {
