@@ -28,8 +28,8 @@ public class BrightOpenCVZoneChooser extends OpenCvPipeline implements ZoneChoos
     protected Target target = Target.UNSET;
 
     public BrightOpenCVZoneChooser() {
-        topROI = new Rect(new Point(223, 120), new Point(287, 145));
-        bottomROI = new Rect(new Point(223, 145), new Point(287, 170));
+        topROI = new Rect(new Point(240, 120), new Point(304, 145));
+        bottomROI = new Rect(new Point(240, 145), new Point(304, 170));
         ringROI = new Rect(new Point(213, 175), new Point(267, 215));
     }
 
@@ -57,18 +57,22 @@ public class BrightOpenCVZoneChooser extends OpenCvPipeline implements ZoneChoos
         //mat.copyTo(input); // use grayscale for debugging
         mat.release(); // use color imaged for book
 
-        Scalar resultColor = new Scalar(255, 0, 255);
+        Scalar matchColor = new Scalar(0, 255, 0);
+        Scalar mismatchColor = new Scalar(255, 0, 0);
         if (topPercentage > THRESH) {
             target = Target.C;
-            Imgproc.rectangle(input, topROI, resultColor);
+            Imgproc.rectangle(input, topROI, matchColor);
+            Imgproc.rectangle(input, bottomROI, matchColor);
         }
         else if (bottomPercentage > THRESH) {
             target = Target.B;
-            Imgproc.rectangle(input, bottomROI, resultColor);
+            Imgproc.rectangle(input, topROI, mismatchColor);
+            Imgproc.rectangle(input, bottomROI, matchColor);
         }
         else {
             target = Target.A;
-            Imgproc.rectangle(input, ringROI, resultColor);
+            Imgproc.rectangle(input, topROI, mismatchColor);
+            Imgproc.rectangle(input, bottomROI, mismatchColor);
         }
 
         telemetry.addData("Top", topPercentage + "%");

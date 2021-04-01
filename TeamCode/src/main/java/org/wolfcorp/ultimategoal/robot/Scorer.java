@@ -14,7 +14,7 @@ import static java.lang.Thread.sleep;
 @Config
 public class Scorer {
     public DcMotorEx intake, outtake, arm, flipper;
-    public Servo gripper, stopper, release, release2;
+    public Servo gripper, stopper, release, release2, testStopper;
     public RevBlinkinLedDriver LED;
 
     public boolean reverse = false;
@@ -46,6 +46,7 @@ public class Scorer {
         arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         release = hardwareMap.get(Servo.class, "release");
         release2 = hardwareMap.get(Servo.class, "release2");
+        testStopper = hardwareMap.get(Servo.class, "testStopper");
         LED = hardwareMap.get(RevBlinkinLedDriver.class, "LED");
         gripper = hardwareMap.get(Servo.class, "gripper");
         stopper = hardwareMap.get(Servo.class, "stopper");
@@ -56,6 +57,7 @@ public class Scorer {
     public void toggleIntake(boolean condition, double speed, int toggleDelay) {
         if (condition && intakeDelay.milliseconds() > toggleDelay) {
             intake.setPower(intake.getPower() == 0 ? speed * (reverse ? 1 : -1) : 0);
+            //if (intake.getVelocity() == 0) { intakeOn(); } else { intake.setPower(0);}
             intakeDelay.reset();
         } else {
             intake.setPower(intake.getPower() != 0 ? speed * (reverse ? 1 : -1) : 0);
@@ -71,7 +73,7 @@ public class Scorer {
 
     public void toggleOuttake(boolean condition, boolean lowerMode, int toggleDelay) {
         if ((condition || lowerMode) && outtakeDelay.milliseconds() > toggleDelay) {
-            outtake.setVelocity(outtake.getVelocity() == 0 ? ((lowerMode ? 0.65 : 1) * 2000) : 0);
+            outtake.setVelocity(outtake.getVelocity() == 0 ? ((lowerMode ? 0.65 : 1) * 1900) : 0);
             stopperClose();
             outtakeDelay.reset();
         }
@@ -86,12 +88,12 @@ public class Scorer {
         if(!automaticCondition)
             xclick = true;
         if (fireAmount > 0) {
-            if (fireDelay.milliseconds() > 680) {
+            if (fireDelay.milliseconds() > 400) {
                 fireDelay.reset();
                 fireAmount--;
                 intakeRingDelta--;
                 intakeRings--;
-            } else if (fireDelay.milliseconds() > 340) {
+            } else if (fireDelay.milliseconds() > 200) {
                 stopperClose();
             } else {
                 stopperOpen();
@@ -101,7 +103,7 @@ public class Scorer {
 
     public void wobbleGripper(boolean condition, int toggleDelay) {
         if (condition && gripperDelay.milliseconds() > toggleDelay) {
-            gripper.setPosition(gripper.getPosition() == 0.3 ? 1 : 0.3);
+            gripper.setPosition(gripper.getPosition() == 0.5 ? 1 : 0.5);
             gripperDelay.reset();
         }
     }
@@ -113,6 +115,14 @@ public class Scorer {
             arm.setPower(-0.8);
         } else {
             arm.setPower(0);
+        }
+    }
+
+    public void toggleTestStopper(boolean condition, boolean condition2) {
+        if (condition) {
+            testStopper.setPosition(0);
+        } else if (condition2) {
+            testStopper.setPosition(0.4);
         }
     }
 
@@ -136,7 +146,7 @@ public class Scorer {
 
     public void armOut(){
         arm.setPower(1);
-        pause(500);
+        pause(750);
         arm.setPower(0);
     }
 
@@ -146,16 +156,22 @@ public class Scorer {
         arm.setPower(0);
     }
 
+    public void armIn(int time) {
+        arm.setPower(-1);
+        pause(time);
+        arm.setPower(0);
+    }
+
     public void intake(int millisDuration) {
         intake.setPower(-1);
         pause(millisDuration);
         intake.setPower(0);
     }
 
-    public void moveFlipper(boolean up, boolean down) {
-        if (up) {
+    public void moveFlipper(boolean down, boolean up) {
+        if (down) {
             flipper.setPower(-0.3);
-        } else if (down) {
+        } else if (up) {
             flipper.setPower(0.3);
         } else {
             flipper.setPower(0);
@@ -165,7 +181,6 @@ public class Scorer {
     public void intakeOn() {
         //intake.setPower(-1);
         intake.setVelocity(-2400);
-        intakeRings = 0;
         intakeRingDelta = 0;
         lastIntakeVel = 0;
     }
@@ -173,7 +188,6 @@ public class Scorer {
     public void intakeSlow() {
         //intake.setPower(-1);
         intake.setVelocity(-2400);
-        intakeRings = 0;
         intakeRingDelta = 0;
         lastIntakeVel = 0;
     }
@@ -225,34 +239,40 @@ public class Scorer {
     public void updateRingCount() {
         double currentIntakeVel = -intake.getVelocity();
 
-        if (currentIntakeVel<1300 && intakeDipFlag == 1){
+        if (currentIntakeVel<800 && intakeDipFlag == 1){
             // two-ring dip
             intakeDipFlag = 2;
         }
-        else if(currentIntakeVel>2300 && intakeDipFlag == 1){
+        else if(currentIntakeVel>2100 && intakeDipFlag == 1){
             // return from one-ring dip
             intakeRings++;
             intakeDipFlag = 0;
         }
-        else if(currentIntakeVel>2300 && intakeDipFlag == 2){
+        else if(currentIntakeVel>2100 && intakeDipFlag == 2){
             // return from two-ring dip
             intakeRings+=2;
             intakeDipFlag = 0;
         }
-        else if(currentIntakeVel>2300){
+        else if(currentIntakeVel>2100){
             // intake running
             intakeDipFlag = 0;
         }
-        else if(currentIntakeVel<2200 && intakeDipFlag == 0){
+        else if(currentIntakeVel<2100 && intakeDipFlag == 0){
             // one-ring dip
             intakeDipFlag = 1;
         }
 
-        if (intakeRings >= 3) {
-            LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP2_HEARTBEAT_FAST);
+        /*
+        if (intakeRings == 3) {
+            LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+        } else if (intakeRings == 2) {
+            LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.ORANGE);
+        } else if (intakeRings == 1) {
+            LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+        } else if (intakeRings > 3) {
+            LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_HEARTBEAT_FAST);
         }
 
-        /*
         if (currentIntakeVel == 0) {
             intakeRings = 0;
             return;

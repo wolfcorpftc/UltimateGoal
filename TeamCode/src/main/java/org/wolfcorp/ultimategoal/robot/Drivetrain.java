@@ -89,7 +89,7 @@ public class Drivetrain extends MecanumDrive {
         FOLLOW_TRAJECTORY
     }
 
-    private boolean useTelemetry = false;
+    private boolean useTelemetry = true;
 
     private FtcDashboard dashboard;
     private NanoClock clock;
@@ -113,6 +113,10 @@ public class Drivetrain extends MecanumDrive {
     private VoltageSensor batteryVoltageSensor;
 
     private Pose2d lastPoseOnTurn;
+
+    private ElapsedTime resetIMUDelay = new ElapsedTime();
+    private ElapsedTime turnToForwardTimer = new ElapsedTime();
+    private boolean turnToForwardRunning = false;
 
     public Drivetrain(HardwareMap hardwareMap) {
         this(hardwareMap, false);
@@ -147,7 +151,7 @@ public class Drivetrain extends MecanumDrive {
         }
 
         // TODO: adjust the names of the following hardware devices to match your configuration
-        if (imu == null || resetIMU || 1==1) {
+        if (imu == null || resetIMU || true) {
             imu = hardwareMap.get(BNO055IMU.class, "imu");
             BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
             parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
@@ -285,7 +289,7 @@ public class Drivetrain extends MecanumDrive {
 
         switch (mode) {
             case IDLE:
-                // do nothing
+                DashboardUtil.drawRobot(fieldOverlay, getPoseEstimate());
                 break;
             case TURN: {
                 double t = clock.seconds() - turnStart;
@@ -322,8 +326,8 @@ public class Drivetrain extends MecanumDrive {
             case FOLLOW_TRAJECTORY: {
                 setDriveSignal(follower.update(currentPose));
 
-                fieldOverlay.setStrokeWidth(1);
-                fieldOverlay.setStroke("#4CAF50");
+                fieldOverlay.setStroke("#2979ff");
+                fieldOverlay.setStrokeWidth(2);
                 if (DRAW_PATH_HISTORY) {
                     for (Path path : pathHistory)
                         DashboardUtil.drawSampledPath(fieldOverlay, path);
@@ -444,6 +448,15 @@ public class Drivetrain extends MecanumDrive {
         return imu.getAngularOrientation().firstAngle;
     }
 
+    public void resetIMU(boolean condition) {
+        if (condition && resetIMUDelay.milliseconds() > 1000) {
+            BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+            parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+            imu.initialize(parameters);
+            resetIMUDelay.reset();
+        }
+    }
+
     public static void normalize(double[] wheelSpeeds) {
         double maxMagnitude = Math.abs(wheelSpeeds[0]);
 
@@ -479,12 +492,12 @@ public class Drivetrain extends MecanumDrive {
         normalize(wheelSpeeds);
 
         for (int i = 0; i < 4; i++) {
+            wheelSpeeds[i] = Math.pow(wheelSpeeds[i], 3);
             if (wheelSpeeds[i] > -0.25 && wheelSpeeds[i] < 0) {
                 wheelSpeeds[i] = -0.25;
             } else if (wheelSpeeds[i] < 0.25 && wheelSpeeds[i] > 0) {
                 wheelSpeeds[i] = 0.25;
             }
-            wheelSpeeds[i] = Math.pow(wheelSpeeds[i], 3);
         }
         normalize(wheelSpeeds);
 
@@ -527,6 +540,29 @@ public class Drivetrain extends MecanumDrive {
         }
     }
 
+    public void turnToForward(boolean condition) {
+        if ((condition || turnToForwardRunning) && turnToForwardTimer.milliseconds() > 500) {
+            turnToForwardTimer.reset();
+            turnToForwardRunning = true;
+            double angle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+            System.out.println(angle);
+            while (Math.abs(angle) >= 0.5) {
+                if(angle<0){
+                    angle=Math.max(0.12,Math.min(1,Math.abs(angle)/40));
+                    setMotorPowers(-angle, -angle, angle, angle);
+                    System.out.println("qweqqq");
+                }
+                else{
+                    angle=Math.max(0.12,Math.min(1,Math.abs(angle)/40));
+                    setMotorPowers(angle, angle, -angle, -angle);
+                    System.out.println("bbbb");
+                }
+                angle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+            }
+            turnToForwardRunning = false;
+        }
+    }
+
     public void turnForward(boolean condition) {
         double angle = Math.toRadians(-imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
         System.out.println(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES));
@@ -539,7 +575,7 @@ public class Drivetrain extends MecanumDrive {
         Pose2d position = getPoseEstimate(); // current position
         // distance from the goal
         double x = 72-position.getX();
-        double y = 36-position.getY();
+        double y = 48-position.getY();
         // solve for the desired pose using trig
         double distance = Math.sqrt(x*x+y*y);
         double degree = Math.toDegrees(Math.atan(-y/x));

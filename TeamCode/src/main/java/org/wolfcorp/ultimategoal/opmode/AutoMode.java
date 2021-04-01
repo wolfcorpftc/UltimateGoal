@@ -57,7 +57,7 @@ public class AutoMode extends LinearOpMode {
             case UNSET:
             case C:
                 targetZoneA = new Pose2d(54, 54, Math.toRadians(-45));
-                targetZoneB = new Pose2d(60, 46, Math.toRadians(-45));
+                targetZoneB = new Pose2d(60, 46, Math.toRadians(0));
                 break;
         }
 
@@ -74,7 +74,7 @@ public class AutoMode extends LinearOpMode {
         // Move and shoot
         Trajectory traj1 = drive
                 .from(initialPose)
-                .lineToLinearHeading(new Pose2d(-14, 52, Math.toRadians(-8)))
+                .lineToLinearHeading(new Pose2d(-14, 52, Math.toRadians(-9)))
                 .build();
 
         // Shoot -> drop wobble goal
@@ -100,13 +100,13 @@ public class AutoMode extends LinearOpMode {
 
         // Path to near wobble goal
         Trajectory traj4 = drive.from(new Pose2d(traj3b.end().getX(), traj3b.end().getY(), Math.toRadians(187)))
-                .lineToLinearHeading(new Pose2d(-56, 44, Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(-54, 44, Math.toRadians(180)))
                 .build();
 
         // Path to wobble goal
         Trajectory traj5 = drive.from(traj4.end())
                 .lineToLinearHeading(
-                        new Pose2d(-56, 35, Math.toRadians(180))
+                        new Pose2d(-53, 34, Math.toRadians(180))
                 )
                 .build();
 
@@ -147,12 +147,12 @@ public class AutoMode extends LinearOpMode {
         drive.follow(traj3b);
         sleep(500);
         drive.turn(Math.toRadians(23));
-        scorer.outtakeOn(-300);
+        scorer.outtakeOn(-200);
         sleep(1000);
         for (int i = 0; i < 5; i++) {
             sleep(300);
             scorer.stopperOpen();
-            sleep(200);
+            sleep(225);
             scorer.stopperClose();
         }
         scorer.outtakeOff();
@@ -184,5 +184,6 @@ public class AutoMode extends LinearOpMode {
 
         // Parking maneuver
         drive.follow(traj7);
+        drive.resetAngle();
     }
 }
