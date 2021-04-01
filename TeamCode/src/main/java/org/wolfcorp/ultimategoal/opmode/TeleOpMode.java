@@ -75,7 +75,7 @@ public class TeleOpMode extends LinearOpMode {
             scorer.reverse(gamepad1.b, 200);
 
             // Intake
-            scorer.toggleIntake(gamepad1.a && !gamepad1.start, 1, 200);
+            scorer.toggleIntake(gamepad1.a && !gamepad1.start, 1, 500);
             if(gamepad1.a && !gamepad1.start){
                 scorer.resetIntakeDipFlag();
             }
@@ -83,7 +83,7 @@ public class TeleOpMode extends LinearOpMode {
 
             // Outtake
             scorer.toggleStopper(gamepad1.dpad_left, gamepad1.x, 200);
-            scorer.toggleOuttake(gamepad1.y || gamepad2.y, gamepad1.left_stick_button || (gamepad2.a && !gamepad2.start), 200);
+            scorer.toggleOuttake(gamepad1.y || gamepad2.y, gamepad1.left_stick_button || (gamepad2.a && !gamepad2.start), 500);
 
             // Wobble Goal
             scorer.wobbleGripper(gamepad1.left_bumper || gamepad2.left_bumper, 200);

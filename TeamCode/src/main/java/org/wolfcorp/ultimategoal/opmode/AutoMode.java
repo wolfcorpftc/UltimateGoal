@@ -3,6 +3,7 @@ package org.wolfcorp.ultimategoal.opmode;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.wolfcorp.ultimategoal.robot.Drivetrain;
@@ -11,6 +12,7 @@ import org.wolfcorp.ultimategoal.vision.BrightOpenCVZoneChooser;
 import org.wolfcorp.ultimategoal.vision.Target;
 import org.wolfcorp.ultimategoal.vision.ZoneChooser;
 
+@Disabled
 @Autonomous(name="WCAuto")
 public class AutoMode extends LinearOpMode {
     protected ZoneChooser chooser;

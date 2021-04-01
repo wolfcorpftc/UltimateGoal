@@ -1,11 +1,13 @@
 package org.wolfcorp.ultimategoal.opmode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.wolfcorp.ultimategoal.robot.Drivetrain;
 import org.wolfcorp.ultimategoal.robot.Scorer;
 
+@Disabled
 @Autonomous(name="Tester", group = "drive")
 public class Tester extends LinearOpMode {
     @Override

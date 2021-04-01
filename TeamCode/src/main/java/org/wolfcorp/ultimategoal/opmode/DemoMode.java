@@ -17,7 +17,7 @@ import org.wolfcorp.ultimategoal.robot.Drivetrain;
 import org.wolfcorp.ultimategoal.robot.Scorer;
 
 @Config
-@TeleOp(name="Testing TeleOp", group = "drive")
+@TeleOp(name="Demo TeleOp", group = "drive")
 public class DemoMode extends LinearOpMode {
     Scorer scorer;
 
@@ -49,7 +49,7 @@ public class DemoMode extends LinearOpMode {
 
             // Outtake
             scorer.toggleStopper(gamepad1.dpad_left, gamepad1.x, 200);
-            scorer.toggleOuttake(gamepad1.y || gamepad2.y, gamepad1.left_stick_button || gamepad2.a, 200);
+            scorer.toggleOuttake(gamepad1.y || gamepad2.y, gamepad2.a && !gamepad2.start, 200);
 
             // Wobble Goal
             scorer.wobbleGripper(gamepad1.left_bumper || gamepad2.left_bumper, 200);
