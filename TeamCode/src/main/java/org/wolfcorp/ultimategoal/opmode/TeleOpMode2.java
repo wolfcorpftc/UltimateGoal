@@ -50,7 +50,7 @@ public class TeleOpMode2 extends LinearOpMode {
 
             TelemetryPacket packet = new TelemetryPacket();
             // Drivetrain
-            double angle = -drive.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
+            double angle = -Drivetrain.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
 
             drive.drive(-gamepad1.right_stick_y * Math.cos(angle) + gamepad1.right_stick_x * Math.sin(angle),
                     gamepad1.right_stick_y * Math.sin(angle) + gamepad1.right_stick_x * Math.cos(angle),
@@ -76,7 +76,7 @@ public class TeleOpMode2 extends LinearOpMode {
 
             // Intake
             scorer.toggleIntake(gamepad1.a && !gamepad1.start, 1, 200);
-            scorer.toggleIntakeFlipper(gamepad1.dpad_right || gamepad2.right_bumper);
+            scorer.toggleIntakeRelease(gamepad1.dpad_right || gamepad2.right_bumper);
 
             // Outtake
             scorer.toggleStopper(gamepad1.dpad_left, gamepad1.x, 200);
@@ -106,7 +106,7 @@ public class TeleOpMode2 extends LinearOpMode {
             packet.put("vel", scorer.outtake.getVelocity());
             packet.put("shoot", scorer.stopper.getPosition() < 0.34 ? 2200 : 1500);
             packet.put("robot speed", drive.rightFront.getPower());
-            packet.put("heading", drive.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
+            packet.put("heading", Drivetrain.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
 
             dashboard.sendTelemetryPacket(packet);
             drive.update(); // odometry update

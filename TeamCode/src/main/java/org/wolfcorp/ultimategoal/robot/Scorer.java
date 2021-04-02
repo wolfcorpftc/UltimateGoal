@@ -9,14 +9,13 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import static java.lang.Thread.sleep;
-
 @Config
 public class Scorer {
-    public DcMotorEx intake, outtake, arm, flipper;
-    public Servo gripper, stopper, release, release2, testStopper;
+    public DcMotorEx intake, outtake, arm, release;
+    public Servo gripper, stopper, testStopper, flipper;
     public RevBlinkinLedDriver LED;
 
+    private boolean releaseFlag = false;
     public boolean reverse = false;
     public int fireAmount = 0;
 
@@ -30,28 +29,32 @@ public class Scorer {
     private boolean xclick = true;
 
     private ElapsedTime intakeDelay = new ElapsedTime();
-    private ElapsedTime flipperDelay = new ElapsedTime();
+    private ElapsedTime releaseDelay = new ElapsedTime();
     private ElapsedTime outtakeDelay = new ElapsedTime();
     private ElapsedTime stopperDelay = new ElapsedTime();
     private ElapsedTime fireDelay = new ElapsedTime();
     private ElapsedTime gripperDelay = new ElapsedTime();
     private ElapsedTime reverseDelay = new ElapsedTime();
+    private ElapsedTime flipperDelay = new ElapsedTime();
 
     public Scorer(HardwareMap hardwareMap) {
         intake = hardwareMap.get(DcMotorEx.class, "intake");
+
         outtake = hardwareMap.get(DcMotorEx.class, "outtake");
         outtake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         outtake.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, outtakeCoeff);
+
         arm = hardwareMap.get(DcMotorEx.class, "arm");
         arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        release = hardwareMap.get(Servo.class, "release");
-        release2 = hardwareMap.get(Servo.class, "release2");
-        testStopper = hardwareMap.get(Servo.class, "testStopper");
-        LED = hardwareMap.get(RevBlinkinLedDriver.class, "LED");
-        gripper = hardwareMap.get(Servo.class, "gripper");
+
+        release = hardwareMap.get(DcMotorEx.class, "release");
+        release.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        release.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         stopper = hardwareMap.get(Servo.class, "stopper");
-        flipper = hardwareMap.get(DcMotorEx.class, "flipper");
-        flipper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        testStopper = hardwareMap.get(Servo.class, "testStopper");
+        gripper = hardwareMap.get(Servo.class, "gripper");
+        flipper = hardwareMap.get(Servo.class, "flipper");
     }
 
     public void toggleIntake(boolean condition, double speed, int toggleDelay) {
@@ -64,10 +67,11 @@ public class Scorer {
         }
     }
 
-    public void toggleIntakeFlipper(boolean condition) {
-        if (condition && flipperDelay.milliseconds() > 200) {
-            release2.setPosition(release2.getPosition() == 1 ? 0 : 1);
-            flipperDelay.reset();
+    public void toggleIntakeRelease(boolean condition) {
+        if (condition && releaseDelay.milliseconds() > 200) {
+            release.setTargetPosition(release.getCurrentPosition() + (releaseFlag ? 1 : -1) * 1000);
+            release.setPower(releaseFlag ? 1 : -1);
+            releaseDelay.reset();
         }
     }
 
@@ -169,13 +173,14 @@ public class Scorer {
     }
 
     public void moveFlipper(boolean down, boolean up) {
+        if ((down || up) && flipperDelay.milliseconds() < 200)
+            return;
         if (down) {
-            flipper.setPower(-0.3);
+            flipper.setPosition(0);
         } else if (up) {
-            flipper.setPower(0.3);
-        } else {
-            flipper.setPower(0);
+            flipper.setPosition(0.5);
         }
+        flipperDelay.reset();
     }
 
     public void intakeOn() {
@@ -220,7 +225,12 @@ public class Scorer {
     }
 
     public void openRelease() {
-        release.setPosition(0.75);
+        if (!releaseFlag) {
+            release.setTargetPosition(release.getCurrentPosition() - 1000);
+            release.setPower(releaseFlag ? 1 : -1);
+            releaseDelay.reset();
+            releaseFlag = true;
+        }
     }
 
     public void pause(int milliseconds) {

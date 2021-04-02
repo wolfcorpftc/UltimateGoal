@@ -2,17 +2,12 @@ package org.wolfcorp.ultimategoal.opmode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
-import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.wolfcorp.ultimategoal.robot.Drivetrain;
 import org.wolfcorp.ultimategoal.robot.Scorer;
 
@@ -79,7 +74,7 @@ public class TeleOpMode extends LinearOpMode {
             if(gamepad1.a && !gamepad1.start){
                 scorer.resetIntakeDipFlag();
             }
-            scorer.toggleIntakeFlipper(gamepad1.dpad_right || gamepad2.right_bumper);
+            scorer.toggleIntakeRelease(gamepad1.dpad_right || gamepad2.right_bumper);
 
             // Outtake
             scorer.toggleStopper(gamepad1.dpad_left, gamepad1.x, 200);
@@ -95,13 +90,14 @@ public class TeleOpMode extends LinearOpMode {
             powershot(gamepad1.back);
 
             // LED vision signal
-            if (timer.seconds() > 110) {
-                // reminder for wobble goals / signal endgame
-                scorer.LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_BREATH_FAST);
-            } else if (timer.seconds() > 85) {
-                // reminder for wobble goals / signal endgame
-                scorer.LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP2_BREATH_FAST);
-            }
+            // TODO: uncomment after getting LED
+//            if (timer.seconds() > 110) {
+//                // reminder for wobble goals / signal endgame
+//                scorer.LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_BREATH_FAST);
+//            } else if (timer.seconds() > 85) {
+//                // reminder for wobble goals / signal endgame
+//                scorer.LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP2_BREATH_FAST);
+//            }
 
             // TODO: add button for manually resetting encoders after banging against wall
             //  (odometry gets more and more inaccurate over time)
