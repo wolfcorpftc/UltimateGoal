@@ -37,7 +37,6 @@ public class DemoMode extends LinearOpMode {
         waitForStart();
 
         //scorer.openRelease();
-
         timer.reset();
         while (opModeIsActive()) {
             // Reversing scoring mechanisms
