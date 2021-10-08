@@ -2,8 +2,10 @@ package org.wolfcorp.ultimategoal.opmode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -18,6 +20,7 @@ public class TeleOpMode extends LinearOpMode {
     Scorer scorer;
 
     private ElapsedTime powershotTurnDelay = new ElapsedTime();
+    private ElapsedTime wallBangDelay = new ElapsedTime();
 
     @Override
     public void runOpMode() {
@@ -38,13 +41,14 @@ public class TeleOpMode extends LinearOpMode {
 
         waitForStart();
 
-        scorer.openRelease();
+        scorer.outtakeDelay.reset();
+        scorer.releaseOpen();
         scorer.stopperClose();
 
         timer.reset();
         while (opModeIsActive()) {
 
-//            TelemetryPacket packet = new TelemetryPacket();
+            TelemetryPacket packet = new TelemetryPacket();
             // Drivetrain
             drive.drive(Math.abs(gamepad1.right_stick_y) < 0.8 && Math.abs(gamepad1.right_stick_y) > 0.05 ? gamepad1.right_stick_y > 0 ? -0.5 : 0.5 : -gamepad1.right_stick_y,
                     Math.abs(gamepad1.right_stick_x) < 0.8 && Math.abs(gamepad1.right_stick_x) > 0.05 ? (gamepad1.right_stick_x > 0 ? 0.5 : -0.5) : gamepad1.right_stick_x,
@@ -77,56 +81,77 @@ public class TeleOpMode extends LinearOpMode {
             scorer.toggleIntakeRelease(gamepad1.dpad_right || gamepad2.right_bumper);
 
             // Outtake
-            scorer.toggleStopper(gamepad1.dpad_left, gamepad1.x, 200);
-            scorer.toggleOuttake(gamepad1.y || gamepad2.y, gamepad1.left_stick_button || (gamepad2.a && !gamepad2.start), 500);
+            scorer.toggleStopper(gamepad1.dpad_left, gamepad1.x, 500);
+            scorer.toggleOuttake(gamepad1.y || gamepad2.y, gamepad1.left_stick_button || (gamepad2.a && !gamepad2.start), 200);
+            scorer.toggleUnsticker(gamepad2.left_stick_button);
 
             // Wobble Goal
             scorer.wobbleGripper(gamepad1.left_bumper || gamepad2.left_bumper, 200);
             scorer.wobbleArm(gamepad1.dpad_down || gamepad2.dpad_down, gamepad1.dpad_up || gamepad2.dpad_up);
             scorer.moveFlipper(gamepad2.b && !gamepad2.start, gamepad2.x);
-            scorer.toggleTestStopper(gamepad2.x, gamepad2.b && !gamepad2.start);
-
             // Powershot
             powershot(gamepad1.back);
 
             // LED vision signal
-            // TODO: uncomment after getting LED
-//            if (timer.seconds() > 110) {
-//                // reminder for wobble goals / signal endgame
-//                scorer.LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_BREATH_FAST);
-//            } else if (timer.seconds() > 85) {
-//                // reminder for wobble goals / signal endgame
-//                scorer.LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP2_BREATH_FAST);
-//            }
+            if (timer.seconds() > 110) {
+                // reminder for wobble goals / signal endgame
+                scorer.LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_BREATH_FAST);
+            } else if (timer.seconds() > 85) {
+                // reminder for wobble goals / signal endgame
+                scorer.LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP2_BREATH_FAST);
+            }
 
             // TODO: add button for manually resetting encoders after banging against wall
             //  (odometry gets more and more inaccurate over time)
-
-            //packet.put("outtake velocity", scorer.outtake.getVelocity());
             //packet.put("outtake shooting", scorer.stopper.getPosition() < 0.34 ? 2200 : 1500);
 /*
             packet.put("robot speed", drive.rightFront.getPower());
             packet.put("heading", drive.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
-
-            dashboard.sendTelemetryPacket(packet);*/
+*/
 
             // Detect rings from intake
             scorer.updateRingCount();
-//            packet.put("intake rings", scorer.intakeRings);
-//            packet.put("intake vel", Math.abs(scorer.intake.getVelocity()));
+            packet.put("intake rings", scorer.intakeRings);
+            packet.put("intake vel", -  scorer.intake.getVelocity());
+            packet.put("outtake", scorer.outtake.getVelocity());
 ////            packet.put("LB vel", drive.leftBack.getVelocity());
 ////            packet.put("LF vel", drive.leftFront.getVelocity());
 ////            packet.put("RB vel", drive.rightBack.getVelocity());
 ////            packet.put("RF vel", drive.rightFront.getVelocity());
 //            dashboard.sendTelemetryPacket(packet);
             drive.update(); // odometry update
+            dashboard.sendTelemetryPacket(packet);
+        }
+    }
+
+    public void autoshoot(boolean condition) {
+        if (condition && wallBangDelay.milliseconds() > 350) {
+            wallBangDelay.reset();
+            int duration = 400;
+            drive.turnTo(0);
+            scorer.flipper.setPosition(.33);
+            scorer.outtakeOn(200);
+            scorer.stopperClose();
+            sleep(duration);
+            scorer.stopperOpen();
+            sleep(duration);
+            scorer.stopperClose();
+            sleep(duration);
+            scorer.stopperOpen();
+            sleep(duration);
+            scorer.stopperClose();
+            sleep(duration);
+            scorer.stopperOpen();
+            sleep(duration);
+            scorer.stopperClose();
+            scorer.flipper.setPosition(.7);
         }
     }
 
     public static double ALIGN_STRAFE = 2;
-    public static double SIDESTEP_1 = 25;
-    public static double SIDESTEP_2 = 9;
-    public static double SIDESTEP_3 = 11;
+    public static double SIDESTEP_1 = 23.5;
+    public static double SIDESTEP_2 = 8;
+    public static double SIDESTEP_3 = 9;
 
     public void powershot(boolean condition) {
 
@@ -139,24 +164,24 @@ public class TeleOpMode extends LinearOpMode {
             Pose2d pose1 = new Pose2d(wall.getX(), wall.getY() + SIDESTEP_1, 0);
             Pose2d pose2 = new Pose2d(wall.getX(), wall.getY() + SIDESTEP_2 + SIDESTEP_1, 0);
             Pose2d pose3 = new Pose2d(wall.getX(), wall.getY() + SIDESTEP_3 + SIDESTEP_2 + SIDESTEP_1, 0);
-            Trajectory traj1 = drive.from(wall, 25, 25)
+            Trajectory traj1 = drive.from(wall, 15, 12)
                     //.strafeLeft(SIDESTEP_1)
                     .lineToLinearHeading(pose1)
                     .build();
-            Trajectory traj2 = drive.from(traj1.end(), 25, 25)
+            Trajectory traj2 = drive.from(traj1.end(), 15, 12)
                     //.strafeLeft(SIDESTEP_2)
                     .lineToLinearHeading(pose2)
                     .build();
-            Trajectory traj3 = drive.from(traj2.end(), 25, 25)
+            Trajectory traj3 = drive.from(traj2.end(), 15, 12)
                     //.strafeLeft(SIDESTEP_3)
                     .lineToLinearHeading(pose3)
                     .build();
-            long sleepDuration = 350;
-            scorer.outtakeOn(-250);
+            long sleepDuration = 200;
+            scorer.outtakeOn(-600);
             drive.follow(align);
             //drive.sidestepRight(0.5, ALIGN_STRAFE);
             drive.setPoseEstimate(wall);
-            sleep(sleepDuration*3/2);
+            sleep(sleepDuration);
             drive.follow(traj1);
             sleep(sleepDuration);
             scorer.stopperOpen();
@@ -178,18 +203,24 @@ public class TeleOpMode extends LinearOpMode {
 
     public void powershotTurn(boolean condition) {
         if (condition) {
-            long sleepDuration = 400;
-            scorer.outtakeOn(-300);
-            sleep(sleepDuration);
-            drive.turn(Math.toRadians(12));
+            long sleepDuration = 500;
+            scorer.outtakeOn(-700);
+            Trajectory align = drive.from(drive.getPoseEstimate())
+                    .strafeRight(5)
+                    .build();
+            drive.follow(align);
+            sleep(sleepDuration*2);
+            drive.turnTo(14);
             scorer.stopperClose();
             sleep(sleepDuration);
             scorer.stopperOpen();
-            drive.turn(Math.toRadians(3));
+            sleep(sleepDuration);
+            drive.turnTo(4);
             scorer.stopperClose();
             sleep(sleepDuration);
             scorer.stopperOpen();
-            drive.turn(Math.toRadians(3));
+            sleep(sleepDuration);
+            drive.turnTo(6.25);
             scorer.stopperClose();
             sleep(sleepDuration);
             scorer.stopperOpen();

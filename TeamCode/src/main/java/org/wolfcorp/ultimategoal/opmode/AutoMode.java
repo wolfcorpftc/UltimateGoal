@@ -70,85 +70,86 @@ public class AutoMode extends LinearOpMode {
         telemetry.addData("BY", targetZoneB.getY());
         telemetry.update();
 
-        drive.setPoseEstimate(initialPose);
+//        drive.setPoseEstimate(initialPose);
+//
+//        // Plan paths with RoadRunner
+//        // Move and shoot
+//        Trajectory traj1 = drive
+//                .from(initialPose)
+//                .lineToLinearHeading(new Pose2d(-14, 52, Math.toRadians(-9)))
+//                .build();
+//
+//        // Shoot -> drop wobble goal
+//        // furthest zone : new Pose2d(48, 56, Math.toRadians(90)
+//        Trajectory traj2 = drive.from(traj1.end())
+//                .lineToLinearHeading(targetZoneA)
+//                .build();
+//
+//        // Drop -> pick up rings
+//        Trajectory traj3 = drive.from(traj2.end())
+//                .lineToLinearHeading(new Pose2d(-12, 27, Math.toRadians(-30)))
+//                .build();
+//
+//        Trajectory traj3a = drive.from(traj3.end()).back(15).build();
+//
+//        Trajectory traj3b = drive.from(traj3a.end(),30,30).back(10).build();
+///*
+//        Trajectory traj3c = drive.from(traj3b.end()).forward(12).build();
+//
+//        Trajectory traj3d = drive.from(traj3c.end()).back(20).build();
+//
+//        Trajectory traj3e = drive.from(traj3d.end()).forward(10).build();*/
+//
+//        // Path to near wobble goal
+//        Trajectory traj4 = drive.from(new Pose2d(traj3b.end().getX(), traj3b.end().getY(), Math.toRadians(187)))
+//                .lineToLinearHeading(new Pose2d(-54, 44, Math.toRadians(180)))
+//                .build();
+//
+//        // Path to wobble goal
+//        Trajectory traj5 = drive.from(traj4.end())
+//                .lineToLinearHeading(
+//                        new Pose2d(-53, 34, Math.toRadians(180))
+//                )
+//                .build();
+//
+//        // Path to Zones
+//        Trajectory traj6 = drive.from(traj5.end())
+//                .lineToLinearHeading(targetZoneB)
+//                .build();
+//
+//        // Path to Park
+//        Trajectory traj7 = drive.from(traj6.end())
+//                .lineToLinearHeading(new Pose2d(12, 36, traj6.end().getHeading()))
+//                .build();
 
-        // Plan paths with RoadRunner
-        // Move and shoot
-        Trajectory traj1 = drive
-                .from(initialPose)
-                .lineToLinearHeading(new Pose2d(-14, 52, Math.toRadians(-9)))
-                .build();
-
-        // Shoot -> drop wobble goal
-        // furthest zone : new Pose2d(48, 56, Math.toRadians(90)
-        Trajectory traj2 = drive.from(traj1.end())
-                .lineToLinearHeading(targetZoneA)
-                .build();
-
-        // Drop -> pick up rings
-        Trajectory traj3 = drive.from(traj2.end())
-                .lineToLinearHeading(new Pose2d(-12, 27, Math.toRadians(-30)))
-                .build();
-
-        Trajectory traj3a = drive.from(traj3.end()).back(15).build();
-
-        Trajectory traj3b = drive.from(traj3a.end(),30,30).back(10).build();
-/*
-        Trajectory traj3c = drive.from(traj3b.end()).forward(12).build();
-
-        Trajectory traj3d = drive.from(traj3c.end()).back(20).build();
-
-        Trajectory traj3e = drive.from(traj3d.end()).forward(10).build();*/
-
-        // Path to near wobble goal
-        Trajectory traj4 = drive.from(new Pose2d(traj3b.end().getX(), traj3b.end().getY(), Math.toRadians(187)))
-                .lineToLinearHeading(new Pose2d(-54, 44, Math.toRadians(180)))
-                .build();
-
-        // Path to wobble goal
-        Trajectory traj5 = drive.from(traj4.end())
-                .lineToLinearHeading(
-                        new Pose2d(-53, 34, Math.toRadians(180))
-                )
-                .build();
-
-        // Path to Zones
-        Trajectory traj6 = drive.from(traj5.end())
-                .lineToLinearHeading(targetZoneB)
-                .build();
-
-        // Path to Park
-        Trajectory traj7 = drive.from(traj6.end())
-                .lineToLinearHeading(new Pose2d(12, 36, traj6.end().getHeading()))
-                .build();
-
-        scorer.gripperClose();
-        scorer.openRelease();
+        //scorer.gripperClose();
+        //scorer.openRelease();
 
         // Move and shoot (high goal)
-        scorer.outtakeOn();
-        drive.follow(traj1);
-        for (int i = 0; i < 3; i++) {
-            sleep(300);
-            scorer.stopperClose();
-            sleep(200);
-            scorer.stopperOpen();
-        }
-        scorer.outtakeOff();
-
-        // Drop the wobble goal (in Zone C for now)
-        drive.follow(traj2);
-        scorer.armOut();
-        scorer.gripperOpen();
-        scorer.armIn();
-
-        // Go back to pick up the rings
-        scorer.intakeSlow();
-        drive.follow(traj3);
-        drive.follow(traj3a);
-        drive.follow(traj3b);
-        sleep(500);
-        drive.turn(Math.toRadians(23));
+        //scorer.outtakeOn();
+//        //drive.follow(traj1);
+//        for (int i = 0; i < 3; i++) {
+//            sleep(300);
+//            scorer.stopperClose();
+//            sleep(200);
+//            scorer.stopperOpen();
+//        }
+//
+//        scorer.outtakeOff();
+//
+//        // Drop the wobble goal (in Zone C for now)
+//        drive.follow(traj2);
+//        scorer.armOut();
+//        scorer.gripperOpen();
+//        scorer.armIn();
+//
+//        // Go back to pick up the rings
+//        scorer.intakeSlow();
+//        drive.follow(traj3);
+//        drive.follow(traj3a);
+//        drive.follow(traj3b);
+//        sleep(500);
+//        drive.turn(Math.toRadians(23));
         scorer.outtakeOn(-200);
         sleep(1000);
         for (int i = 0; i < 5; i++) {
@@ -158,34 +159,34 @@ public class AutoMode extends LinearOpMode {
             scorer.stopperClose();
         }
         scorer.outtakeOff();
-
-        // Drive near wobble goal
-        drive.turn(Math.toRadians(180));
-        scorer.intakeOff();
-        drive.updatePoseEstimate();
-        drive.follow(traj4);
-
-        // Lower wobble arm
-        scorer.gripperOpen();
-        scorer.armOut();
-
-        // Drive to wobble goal
-        drive.follow(traj5);
-
-        // Grab wobble goal
-        sleep(50);
-        scorer.gripperClose();
-
-        // Drive to Zone
-        drive.follow(traj6);
-
-        // Dropping wobble goal
-        scorer.gripperOpen();
-        // TODO: Make this a temporal marker
-        //scorer.armIn();
-
-        // Parking maneuver
-        drive.follow(traj7);
-        drive.resetAngle();
+//
+//        // Drive near wobble goal
+//        drive.turn(Math.toRadians(180));
+//        scorer.intakeOff();
+//        drive.updatePoseEstimate();
+//        drive.follow(traj4);
+//
+//        // Lower wobble arm
+//        scorer.gripperOpen();
+//        scorer.armOut();
+//
+//        // Drive to wobble goal
+//        drive.follow(traj5);
+//
+//        // Grab wobble goal
+//        sleep(50);
+//        scorer.gripperClose();
+//
+//        // Drive to Zone
+//        drive.follow(traj6);
+//
+//        // Dropping wobble goal
+//        scorer.gripperOpen();
+//        // TODO: Make this a temporal marker
+//        //scorer.armIn();
+//
+//        // Parking maneuver
+//        drive.follow(traj7);
+//        drive.resetAngle();
     }
 }

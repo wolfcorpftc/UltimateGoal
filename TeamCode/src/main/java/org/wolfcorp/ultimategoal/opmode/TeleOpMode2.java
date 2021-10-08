@@ -43,7 +43,7 @@ public class TeleOpMode2 extends LinearOpMode {
 
         waitForStart();
 
-        scorer.openRelease();
+        //scorer.openRelease();
 
         timer.reset();
         while (opModeIsActive()) {

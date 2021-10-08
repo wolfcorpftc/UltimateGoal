@@ -186,8 +186,8 @@ public class Drivetrain extends MecanumDrive {
         }
 
         // TODO: reverse any motors using DcMotor.setDirection()
-        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Set up odometry
         //setLocalizer(new ThreeWheelTrackingLocalizer(hardwareMap));
@@ -523,21 +523,23 @@ public class Drivetrain extends MecanumDrive {
             setMotorPowers(angle, angle, -angle, -angle);
         }
     }
+
     public void turnTo(double degree){
-        double angle = degree + imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-        System.out.println(angle);
-        if(Math.abs(angle)<0.5){
-            setMotorPowers(0, 0, 0, 0);
-            return;
+        double start = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+        double error = degree;
+        while (Math.abs(error) >= 0.1 || (leftFront.getPower() < 0 && error < 0) || (leftFront.getPower() > 0 && error > 0)) {
+            System.out.println(error);
+            if(error>0){
+                error=Math.max(0.15,Math.min(1,Math.abs(error)/30));
+                setMotorPowers(-error, -error, error, error);
+            }
+            else{
+                error=Math.max(0.15,Math.min(1,Math.abs(error)/30));
+                setMotorPowers(error, error, -error, -error);
+            }
+            error = start + degree - imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
         }
-        if(angle<0){
-            angle=Math.max(0.1,Math.min(1,Math.abs(angle)/50));
-            setMotorPowers(-angle, -angle, angle, angle);
-        }
-        else{
-            angle=Math.max(0.1,Math.min(1,Math.abs(angle)/50));
-            setMotorPowers(angle, angle, -angle, -angle);
-        }
+        setMotorPowers(0,0,0,0);
     }
 
     public void turnToForward(boolean condition) {
@@ -545,17 +547,15 @@ public class Drivetrain extends MecanumDrive {
             turnToForwardTimer.reset();
             turnToForwardRunning = true;
             double angle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-            System.out.println(angle);
-            while (Math.abs(angle) >= 0.5) {
+            while (Math.abs(angle) >= 0.13) {
+                System.out.println(angle);
                 if(angle<0){
-                    angle=Math.max(0.12,Math.min(1,Math.abs(angle)/40));
+                    angle=Math.max(0.13,Math.min(1,Math.abs(angle)/30));
                     setMotorPowers(-angle, -angle, angle, angle);
-                    System.out.println("qweqqq");
                 }
                 else{
-                    angle=Math.max(0.12,Math.min(1,Math.abs(angle)/40));
+                    angle=Math.max(0.13,Math.min(1,Math.abs(angle)/30));
                     setMotorPowers(angle, angle, -angle, -angle);
-                    System.out.println("bbbb");
                 }
                 angle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
             }
@@ -674,11 +674,11 @@ public class Drivetrain extends MecanumDrive {
         drive(speed, -degrees, degrees, -degrees, degrees);
     }
 
-    public void sidestepRight(double speed, double distance) {
+    public void sidestepLeft(double speed, double distance) {
         drive(speed, distance, -distance, -distance, distance);
     }
 
-    public void sidestepLeft(double speed, double distance) {
+    public void sidestepRight(double speed, double distance) {
         drive(speed, -distance, distance, distance, -distance);
     }
 }

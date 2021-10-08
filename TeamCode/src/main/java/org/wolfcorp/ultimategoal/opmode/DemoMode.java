@@ -29,7 +29,7 @@ public class DemoMode extends LinearOpMode {
 
         waitForStart();
 
-        scorer.openRelease();
+        //scorer.openRelease();
 
         timer.reset();
         while (opModeIsActive()) {

@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -12,11 +13,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @Config
 public class Scorer {
     public DcMotorEx intake, outtake, arm, release;
-    public Servo gripper, stopper, testStopper, flipper;
+    public Servo gripper, stopper, flipper, unsticker;
     public RevBlinkinLedDriver LED;
 
     private boolean releaseFlag = false;
     public boolean reverse = false;
+    private boolean unstickerClick = false;
+    private boolean intakeOn = false;
     public int fireAmount = 0;
 
     public int intakeRingDelta = 0;
@@ -30,7 +33,7 @@ public class Scorer {
 
     private ElapsedTime intakeDelay = new ElapsedTime();
     private ElapsedTime releaseDelay = new ElapsedTime();
-    private ElapsedTime outtakeDelay = new ElapsedTime();
+    public ElapsedTime outtakeDelay = new ElapsedTime();
     private ElapsedTime stopperDelay = new ElapsedTime();
     private ElapsedTime fireDelay = new ElapsedTime();
     private ElapsedTime gripperDelay = new ElapsedTime();
@@ -48,13 +51,15 @@ public class Scorer {
         arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         release = hardwareMap.get(DcMotorEx.class, "release");
-        release.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         release.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         stopper = hardwareMap.get(Servo.class, "stopper");
-        testStopper = hardwareMap.get(Servo.class, "testStopper");
+        //testStopper = hardwareMap.get(Servo.class, "testStopper");
         gripper = hardwareMap.get(Servo.class, "gripper");
         flipper = hardwareMap.get(Servo.class, "flipper");
+        unsticker = hardwareMap.get(Servo.class, "unsticker");
+
+        LED = hardwareMap.get(RevBlinkinLedDriver.class, "LED");
     }
 
     public void toggleIntake(boolean condition, double speed, int toggleDelay) {
@@ -67,47 +72,96 @@ public class Scorer {
         }
     }
 
+    public void releaseOpen() {
+        if (!releaseFlag) {
+            release.setPower(1);
+            pause(50);
+            release.setPower(0);
+            releaseFlag = true;
+        }
+    }
+
     public void toggleIntakeRelease(boolean condition) {
         if (condition && releaseDelay.milliseconds() > 200) {
-            release.setTargetPosition(release.getCurrentPosition() + (releaseFlag ? 1 : -1) * 1000);
-            release.setPower(releaseFlag ? 1 : -1);
+            if (releaseFlag) {
+                release.setPower(-0.7);
+                pause(150);
+                release.setPower(0);
+                releaseFlag = false;
+            } else {
+                release.setPower(1);
+                pause(50);
+                release.setPower(0);
+                releaseFlag = true;
+            }
             releaseDelay.reset();
         }
     }
 
     public void toggleOuttake(boolean condition, boolean lowerMode, int toggleDelay) {
         if ((condition || lowerMode) && outtakeDelay.milliseconds() > toggleDelay) {
-            outtake.setVelocity(outtake.getVelocity() == 0 ? ((lowerMode ? 0.65 : 1) * 1900) : 0);
+            outtake.setVelocity(outtake.getVelocity() < 1100 ? ((lowerMode ? 0.77 : 1) * 1760) : 0);
+            flipper.setPosition(outtake.getVelocity() < 1100 ? 0.15 : 0.55);
             stopperClose();
             outtakeDelay.reset();
         }
     }
 
+//    public void toggleStopper(boolean manualCondition, boolean automaticCondition, int toggleDelay) {
+//        if ((manualCondition || automaticCondition) && xclick && stopperDelay.milliseconds() > toggleDelay) {
+//            xclick = false;
+//            fireAmount = manualCondition ? 1 : 3;
+//            fireDelay.reset();
+//        }
+//        if(!automaticCondition)
+//            xclick = true;
+//        if (fireAmount > 0) {
+//            if (fireDelay.milliseconds() > 600) {
+//                fireDelay.reset();
+//                fireAmount--;
+//                intakeRingDelta--;
+//                intakeRings--;
+//            } else if (fireDelay.milliseconds() > 300) {
+//                stopperOpen();
+//            } else {
+//                stopperClose();
+//            }
+//        }
+//    }
+
     public void toggleStopper(boolean manualCondition, boolean automaticCondition, int toggleDelay) {
-        if ((manualCondition || automaticCondition) && xclick && stopperDelay.milliseconds() > toggleDelay) {
-            xclick = false;
-            fireAmount = manualCondition ? 1 : 3;
+        if (manualCondition || automaticCondition) {
             fireDelay.reset();
-        }
-        if(!automaticCondition)
-            xclick = true;
-        if (fireAmount > 0) {
-            if (fireDelay.milliseconds() > 400) {
-                fireDelay.reset();
-                fireAmount--;
-                intakeRingDelta--;
-                intakeRings--;
-            } else if (fireDelay.milliseconds() > 200) {
-                stopperClose();
-            } else {
-                stopperOpen();
+            stopperOpen();
+            while (fireDelay.milliseconds() < 300) {
+
             }
+            stopperClose();
         }
+//        if ((manualCondition || automaticCondition) && xclick && stopperDelay.milliseconds() > toggleDelay) {
+//            xclick = false;
+//            fireAmount = manualCondition ? 1 : 3;
+//            fireDelay.reset();
+//        }
+//        if(!automaticCondition)
+//            xclick = true;
+//        if (fireAmount > 0) {
+//            if (fireDelay.milliseconds() > 600) {
+//                fireDelay.reset();
+//                fireAmount--;
+//                intakeRingDelta--;
+//                intakeRings--;
+//            } else if (fireDelay.milliseconds() > 300) {
+//                stopperClose();
+//            } else {
+//                stopperOpen();
+//            }
+//        }
     }
 
     public void wobbleGripper(boolean condition, int toggleDelay) {
         if (condition && gripperDelay.milliseconds() > toggleDelay) {
-            gripper.setPosition(gripper.getPosition() == 0.5 ? 1 : 0.5);
+            gripper.setPosition(gripper.getPosition() == 0.51 ? 1 : 0.51);
             gripperDelay.reset();
         }
     }
@@ -122,14 +176,6 @@ public class Scorer {
         }
     }
 
-    public void toggleTestStopper(boolean condition, boolean condition2) {
-        if (condition) {
-            testStopper.setPosition(0);
-        } else if (condition2) {
-            testStopper.setPosition(0.4);
-        }
-    }
-
     public void reverse(boolean condition, int toggleDelay) {
         if (condition && reverseDelay.milliseconds() > toggleDelay) {
             reverse = !reverse;
@@ -140,12 +186,10 @@ public class Scorer {
 
     public void gripperOpen(){
         gripper.setPosition(1);
-        pause(400);
     }
 
     public void gripperClose(){
-        gripper.setPosition(0.3);
-        pause(600);
+        gripper.setPosition(0.51);
     }
 
     public void armOut(){
@@ -173,25 +217,40 @@ public class Scorer {
     }
 
     public void moveFlipper(boolean down, boolean up) {
-        if ((down || up) && flipperDelay.milliseconds() < 200)
-            return;
-        if (down) {
-            flipper.setPosition(0);
-        } else if (up) {
-            flipper.setPosition(0.5);
+        if ((down || up) && flipperDelay.milliseconds() > 20) {
+            System.out.println(flipper.getPosition());
+            if (down && flipper.getPosition() > 0.15) {
+                flipper.setPosition(flipper.getPosition() - 0.012);
+                flipperDelay.reset();
+            } else if (up && flipper.getPosition() < 0.55) {
+                flipper.setPosition(flipper.getPosition() + 0.012);
+                flipperDelay.reset();
+            }
         }
-        flipperDelay.reset();
+    }
+
+    public void toggleUnsticker (boolean toggle) {
+        if (toggle && !unstickerClick) {
+            unstickerClick = true;
+            unsticker.setPosition(1);
+            pause(500);
+            unsticker.setPosition(0.38);
+            pause(500);
+            unsticker.setPosition(1);
+            pause(500);
+            unsticker.setPosition(0.38);
+        } else {
+            unstickerClick = false;
+        }
     }
 
     public void intakeOn() {
-        //intake.setPower(-1);
         intake.setVelocity(-2400);
         intakeRingDelta = 0;
         lastIntakeVel = 0;
     }
 
     public void intakeSlow() {
-        //intake.setPower(-1);
         intake.setVelocity(-2400);
         intakeRingDelta = 0;
         lastIntakeVel = 0;
@@ -205,11 +264,11 @@ public class Scorer {
     }
 
     public void outtakeOn() {
-        outtake.setVelocity(1520);
+        outtake.setVelocity(1800);
     }
 
     public void outtakeOn(int difference) {
-        outtake.setVelocity(1520+difference);
+        outtake.setVelocity(1800+difference);
     }
 
     public void outtakeOff() {
@@ -217,20 +276,11 @@ public class Scorer {
     }
 
     public void stopperOpen() {
-        stopper.setPosition(0.02);
+        stopper.setPosition(0.35);
     }
 
     public void stopperClose() {
-        stopper.setPosition(0.34);
-    }
-
-    public void openRelease() {
-        if (!releaseFlag) {
-            release.setTargetPosition(release.getCurrentPosition() - 1000);
-            release.setPower(releaseFlag ? 1 : -1);
-            releaseDelay.reset();
-            releaseFlag = true;
-        }
+        stopper.setPosition(0.80);
     }
 
     public void pause(int milliseconds) {
@@ -247,41 +297,49 @@ public class Scorer {
     }
 
     public void updateRingCount() {
-        double currentIntakeVel = -intake.getVelocity();
-
-        if (currentIntakeVel<800 && intakeDipFlag == 1){
-            // two-ring dip
-            intakeDipFlag = 2;
-        }
-        else if(currentIntakeVel>2100 && intakeDipFlag == 1){
-            // return from one-ring dip
-            intakeRings++;
-            intakeDipFlag = 0;
-        }
-        else if(currentIntakeVel>2100 && intakeDipFlag == 2){
-            // return from two-ring dip
-            intakeRings+=2;
-            intakeDipFlag = 0;
-        }
-        else if(currentIntakeVel>2100){
-            // intake running
-            intakeDipFlag = 0;
-        }
-        else if(currentIntakeVel<2100 && intakeDipFlag == 0){
-            // one-ring dip
-            intakeDipFlag = 1;
-        }
+//        double currentIntakeVel = -intake.getVelocity();
+//
+//        if (currentIntakeVel<800 && intakeDipFlag == 1){
+//            // two-ring dip
+//            intakeDipFlag = 2;
+//        }
+//        else if(currentIntakeVel>1600 && intakeDipFlag == 1){
+//            // return from one-ring dip
+//            if (intakeRings < 3) {
+//                intakeRings++;
+//            }
+//            intakeDipFlag = 0;
+//        }
+//        else if(currentIntakeVel>1600 && intakeDipFlag == 2){
+//            // return from two-ring dip
+//            if (intakeRings < 2) {
+//                intakeRings++;
+//            }
+//            intakeDipFlag = 0;
+//        }
+//        else if(currentIntakeVel>1600){
+//            // intake running
+//            intakeDipFlag = 0;
+//        }
+//        else if(currentIntakeVel<1700 && intakeDipFlag == 0){
+//            // one-ring dip
+//            intakeDipFlag = 1;
+//        }
+//
+//
+//        if (intakeRings == 3) {
+//            LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+//        } else if (intakeRings == 2) {
+//            LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.ORANGE);
+//        } else if (intakeRings == 1) {
+//            LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+//        } else if (intakeRings > 3) {
+//            LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_HEARTBEAT_FAST);
+//        } else {
+//            LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
+//        }
 
         /*
-        if (intakeRings == 3) {
-            LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
-        } else if (intakeRings == 2) {
-            LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.ORANGE);
-        } else if (intakeRings == 1) {
-            LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-        } else if (intakeRings > 3) {
-            LED.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_HEARTBEAT_FAST);
-        }
 
         if (currentIntakeVel == 0) {
             intakeRings = 0;
